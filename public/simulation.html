@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulation — Principle Scenarios</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #0a1628;
+      --bg-card: rgba(15, 23, 42, 0.8);
+      --border: rgba(96, 165, 250, 0.15);
+      --border-strong: rgba(96, 165, 250, 0.4);
+      --text: #e8edf5;
+      --text-muted: #94a3b8;
+      --accent: #3b82f6;
+      --accent-bright: #60a5fa;
+      --accent-deep: #2563eb;
+      --green: #34d399;
+      --red: #fb7185;
+      --yellow: #fbbf24;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      background: radial-gradient(ellipse at top, #0e1f3a 0%, var(--bg) 60%);
+      background-attachment: fixed;
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+    a { color: var(--accent-bright); text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; }
+
+    header {
+      position: sticky; top: 0; z-index: 10;
+      background: rgba(10, 22, 40, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+    }
+    .nav-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .brand { font-weight: 700; font-size: 18px; display: flex; align-items: center; gap: 10px; }
+    .brand .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent-bright); box-shadow: 0 0 12px var(--accent-bright); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .nav-links { display: flex; gap: 8px; align-items: center; }
+    .nav-links a { padding: 8px 14px; border-radius: 8px; color: var(--text-muted); font-size: 14px; font-weight: 500; }
+    .nav-links a:hover, .nav-links a.active { background: rgba(59, 130, 246, 0.15); color: var(--text); }
+    .dropdown-menu { display: none; }
+    .dropdown-menu.show { display: block; }
+    .dropdown-item { transition: all 0.15s; }
+    .dropdown-item:hover { background: rgba(59, 130, 246, 0.15) !important; color: var(--text) !important; }
+
+
+    .sim-layout { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 340px; gap: 32px; padding: 28px 24px 80px; align-items: start; }
+    @media (max-width: 900px) { .sim-layout { grid-template-columns: 1fr; } }
+    .sim-main-content { min-width: 0; }
+    
+    .activity-sidebar {
+      background: var(--bg-card); backdrop-filter: blur(10px);
+      border: 1px solid var(--border); border-radius: 16px;
+      padding: 24px; position: sticky; top: 90px;
+      max-height: calc(100vh - 120px); overflow-y: auto;
+    }
+    .activity-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    
+    .comments-section {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px; margin-top: 20px;
+    }
+    .comments-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; }
+    .comment-placeholder { padding: 40px 20px; text-align: center; color: var(--text-muted); border: 1px dashed var(--border-strong); border-radius: 12px; }
+
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(10, 22, 40, 0.95); backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border-strong);
+      padding: 12px 24px; display: flex; justify-content: center; gap: 16px;
+      z-index: 100;
+    }
+    .back { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; display: inline-block; }
+    .back:hover { color: var(--text); }
+    @media (min-width: 900px) { .bottom-nav { display: none !important; } }
+
+    .sim-header { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 28px; margin-bottom: 20px; backdrop-filter: blur(10px); }
+    .sim-meta { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; }
+    .badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; padding: 4px 10px; border-radius: 999px; background: rgba(34, 197, 94, 0.15); color: var(--green); }
+    .badge.live::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); animation: pulse 1.6s infinite; }
+    .badge.concluded { background: rgba(148, 163, 184, 0.15); color: var(--text-muted); }
+    .badge.upcoming { background: rgba(251, 191, 36, 0.15); color: var(--yellow); }
+    h1.sim-title { font-size: 26px; font-weight: 700; line-height: 1.25; margin-bottom: 12px; }
+    .sim-desc { color: var(--text-muted); font-size: 15px; margin-bottom: 20px; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px solid var(--border-strong);
+      color: var(--accent-bright);
+      padding: 9px 16px; border-radius: 10px;
+      font-size: 14px; font-weight: 500;
+      transition: all 0.15s;
+    }
+    .btn:hover { background: rgba(59, 130, 246, 0.25); }
+    .btn.primary { background: var(--accent-deep); color: white; border-color: var(--accent-deep); }
+    .btn.primary:hover { background: var(--accent); box-shadow: 0 4px 16px -4px rgba(59,130,246,0.6); transform: translateY(-1px); }
+    .btn .num { font-weight: 700; }
+    .btn .lbl { color: var(--text-muted); font-weight: 400; }
+    .btn.primary .lbl { color: rgba(255,255,255,0.75); }
+    .stat-pill { padding: 9px 14px; border-radius: 10px; background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border); font-size: 13px; color: var(--text-muted); }
+    .stat-pill strong { color: var(--text); font-weight: 700; }
+
+    .chart-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; backdrop-filter: blur(10px); margin-bottom: 20px; }
+    .chart-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+    .chart-head h2 { font-size: 14px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+    .chart-head .pct { font-size: 28px; font-weight: 700; color: var(--accent-bright); }
+    .chart-card .canvas { width: 100%; height: 340px; }
+
+
+
+    .timeline { display: flex; flex-direction: column; gap: 12px; }
+    .event {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--text-muted);
+      border-radius: 10px;
+      padding: 14px 16px;
+      backdrop-filter: blur(10px);
+      display: flex; gap: 14px; align-items: flex-start;
+      transition: all 0.2s;
+    }
+    .event:hover { transform: translateX(4px); border-color: var(--border-strong); background: rgba(15, 23, 42, 0.95); }
+    .event.up { border-left-color: var(--green); }
+    .event.down { border-left-color: var(--red); }
+    .event .impact-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0;
+    }
+    .event.up .impact-icon { background: rgba(34, 197, 94, 0.15); color: var(--green); }
+    .event.down .impact-icon { background: rgba(239, 68, 68, 0.15); color: var(--red); }
+    .event.neutral .impact-icon { background: rgba(148, 163, 184, 0.15); color: var(--text-muted); }
+    .event .body { flex: 1; }
+    .event .ev-head { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; flex-wrap: wrap; }
+    .event .ev-title { font-size: 14px; font-weight: 600; }
+    .event .ev-time { font-size: 12px; color: var(--text-muted); }
+    .event .ev-desc { font-size: 13px; color: var(--text-muted); }
+    .event .branch-tag { display: inline-block; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; padding: 2px 8px; border-radius: 999px; background: rgba(251, 191, 36, 0.15); color: var(--yellow); }
+
+    .empty { text-align: center; color: var(--text-muted); padding: 60px 20px; }
+
+    /* --- New Enhancements --- */
+    .btn.back-top {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 12px; border-radius: 8px;
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+      color: var(--text-muted); text-decoration: none; font-size: 13px;
+      transition: all 0.2s; margin-bottom: 20px;
+    }
+    .btn.back-top:hover { background: rgba(255,255,255,0.08); color: var(--text); }
+
+    .comment-action-btn svg { transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .comment-action-btn:active svg { transform: scale(1.3); }
+
+    #comment-input, .reply-form input { box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+    #comment-input:focus, .reply-form input:focus { box-shadow: inset 0 2px 4px rgba(0,0,0,0.1), 0 0 0 2px rgba(59,130,246,0.3); }
+
+    .chart-tooltip {
+      position: absolute; pointer-events: none;
+      background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(12px);
+      border: 1px solid var(--border-strong); border-radius: 10px;
+      padding: 10px 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      color: var(--text); font-size: 13px; z-index: 50;
+      opacity: 0; transition: opacity 0.15s;
+    }
+    .chart-tooltip.show { opacity: 1; }
+    .chart-tooltip .tt-date { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .chart-tooltip .tt-val { font-size: 16px; font-weight: 700; color: var(--accent-bright); }
+    .chart-crosshair {
+      position: absolute; top: 0; bottom: 0; width: 1px;
+      background: rgba(96, 165, 250, 0.4); border-left: 1px dashed rgba(96, 165, 250, 0.8);
+      pointer-events: none; opacity: 0; z-index: 10;
+    }
+
+    /* --- World Card section --- */
+    .wc-field-select {
+      width: 100%; background: rgba(10,22,40,0.7);
+      border: 1px solid var(--border-strong); color: var(--text);
+      font-family: inherit; font-size: 14px;
+      padding: 10px 14px; border-radius: 10px;
+      margin-bottom: 18px; cursor: pointer;
+    }
+    .wc-field-select:focus { outline: none; border-color: var(--accent-bright); }
+    .wc-stat-row {
+      display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 18px;
+    }
+    .wc-stat {
+      background: rgba(15,23,42,0.7); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 16px; flex: 1; min-width: 120px;
+    }
+    .wc-stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 4px; }
+    .wc-stat-value { font-size: 20px; font-weight: 700; color: var(--accent-bright); }
+    .wc-stat-value.up   { color: var(--green); }
+    .wc-stat-value.down { color: var(--red); }
+    .wc-tick-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 16px; }
+    .wc-tick-table th { color: var(--text-muted); font-weight: 600; text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+    .wc-tick-table td { padding: 7px 10px; border-bottom: 1px solid rgba(96,165,250,0.06); color: var(--text); }
+    .wc-tick-table tr:last-child td { border-bottom: none; }
+    .wc-tick-table .delta.up   { color: var(--green); }
+    .wc-tick-table .delta.down { color: var(--red); }
+    .wc-tick-table .delta.flat { color: var(--text-muted); }
+
+    /* --- Entity Vitals section --- */
+    .ev-section { margin-top: 32px; }
+    .ev-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+    .ev-header h2 { font-size: 18px; font-weight: 700; flex: 1; min-width: 160px; }
+    .ev-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .ev-field-select {
+      background: rgba(10,22,40,0.7); border: 1px solid var(--border-strong); color: var(--text);
+      font-family: inherit; font-size: 13px; padding: 8px 12px; border-radius: 8px; cursor: pointer;
+    }
+    .ev-field-select:focus { outline: none; border-color: var(--accent-bright); }
+    .ev-filter-select {
+      background: rgba(10,22,40,0.7); border: 1px solid var(--border); color: var(--text-muted);
+      font-family: inherit; font-size: 13px; padding: 8px 12px; border-radius: 8px; cursor: pointer;
+    }
+    .ev-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    .ev-card {
+      background: rgba(15,23,42,0.7); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px 16px;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative; overflow: hidden;
+    }
+    .ev-card:hover { border-color: var(--border-strong); background: rgba(20,30,55,0.8); }
+    .ev-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+    .ev-card-name { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.3; }
+    .ev-badge {
+      font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 20px;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .ev-badge.agent { background: rgba(59,130,246,0.2); color: var(--accent-bright); border: 1px solid rgba(59,130,246,0.3); }
+    .ev-badge.meta  { background: rgba(251,191,36,0.15); color: var(--yellow); border: 1px solid rgba(251,191,36,0.3); }
+    .ev-score-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+    .ev-score { font-size: 28px; font-weight: 700; line-height: 1; }
+    .ev-score.high   { color: var(--green); }
+    .ev-score.medium { color: var(--accent-bright); }
+    .ev-score.low    { color: var(--red); }
+    .ev-score.na     { color: var(--text-muted); font-size: 18px; }
+    .ev-delta { font-size: 12px; font-weight: 600; }
+    .ev-delta.up   { color: var(--green); }
+    .ev-delta.down { color: var(--red); }
+    .ev-delta.flat { color: var(--text-muted); }
+    .ev-spark { width: 100%; height: 28px; display: block; }
+    .ev-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 6px; }
+    .ev-bar-bg { width: 100%; height: 4px; background: rgba(96,165,250,0.12); border-radius: 2px; margin-top: 8px; }
+    .ev-bar-fill { height: 4px; border-radius: 2px; background: var(--accent-bright); transition: width 0.4s; }
+    .ev-bar-fill.high   { background: var(--green); }
+    .ev-bar-fill.medium { background: var(--accent-bright); }
+    .ev-bar-fill.low    { background: var(--red); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav-inner">
+      <a href="/" class="brand" style="text-decoration: none; color: inherit;"><span class="dot"></span> Principle Scenarios</a>
+      <div id="header-profile-container"></div>
+    </div>
+  </header>
+
+  <div class="sim-layout" id="content">
+    <div class="empty">Loading simulation…</div>
+  </div>
+
+  <script>
+    // Agents whose id starts with "meta-" are market/environmental context factors, not individual agents.
+    // Exception: "meta-ai" is Meta AI the company (a real agent).
+    function isMarketFactor(agentId) {
+      return agentId.startsWith('meta-') && agentId !== 'meta-ai';
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const SIM_ID = params.get('id');
+    const content = document.getElementById('content');
+    let activeTab = 'live';
+    let sim = null;
+    let meGlobal = null;
+
+    let defaultComments = [
+      {
+        id: 1,
+        name: "Alex Sterling",
+        title: "Director of Strategy at TechCorp",
+        avatar: "AS",
+        text: "Interesting trajectory. We've been modeling similar outcomes based on the latest AI governance proposals in the EU.",
+        timeAgo: "2 hours ago",
+        upvotes: 4,
+        hasUpvoted: false,
+        replies: [
+          {
+            id: 101,
+            name: "Jordan Lee",
+            title: "VP Product at Innovate Inc",
+            avatar: "JL",
+            text: "Are you factoring in the open source carve-outs?",
+            timeAgo: "1 hour ago",
+            upvotes: 1,
+            hasUpvoted: false,
+            replies: []
+          }
+        ]
+      },
+      {
+        id: 2,
+        name: "Jordan Lee",
+        title: "VP Product at Innovate Inc",
+        avatar: "JL",
+        text: "I wonder if the recent compute resource shortages will slow down this timeline.",
+        timeAgo: "5 hours ago",
+        upvotes: 0,
+        hasUpvoted: false,
+        replies: []
+      }
+    ];
+    let replyingToId = null;
+    let mockSettings = { profileHidden: false };
+    try {
+      const saved = localStorage.getItem('mockSettings');
+      if (saved) mockSettings = JSON.parse(saved);
+    } catch(e){}
+
+    if (!SIM_ID) {
+      content.innerHTML = '<div class="empty">No simulation specified. <a href="/">← Back to feed</a></div>';
+    } else {
+      load();
+    }
+
+    async function load() {
+      try {
+        const res = await fetch(`/api/simulations/${encodeURIComponent(SIM_ID)}`);
+        if (res.status === 401) {
+          window.location.href = '/';
+          return;
+        }
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to load');
+        sim = data.simulation;
+        
+        // Fetch user state for header
+        try {
+          const meRes = await fetch('/api/me');
+          if (meRes.ok) {
+            const meData = await meRes.json();
+            meGlobal = meData.member;
+            renderHeaderProfile(meGlobal);
+          }
+        } catch (e) {}
+        
+        render();
+      } catch (err) {
+        content.innerHTML = `<div class="empty">${escapeHtml(err.message)} <br><a href="/">← Back to feed</a></div>`;
+      }
+    }
+
+    function render() {
+      const status = (sim.status || 'live').toLowerCase();
+      content.innerHTML = `
+        <div class="sim-main-content">
+          <a href="/" class="btn back-top">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Back to feed
+          </a>
+          <div class="sim-header">
+            <div class="sim-meta">
+              <span class="badge ${status}">${status === 'live' ? 'Live' : status[0].toUpperCase() + status.slice(1)}</span>
+              <span class="stat-pill"><strong id="fc">${sim.followerCount}</strong> following</span>
+              <span class="stat-pill"><strong id="cc">${sim.confidenceCount}</strong> confidence ${sim.followerCount > 0 ? `(<strong id="cp">${sim.confidencePct}</strong>%)` : ''}</span>
+            </div>
+            <h1 class="sim-title">${escapeHtml(sim.title)}</h1>
+            <p class="sim-desc">${escapeHtml(sim.description)}</p>
+            <div class="actions">
+              <button class="btn ${sim.isFollowing ? 'primary' : ''}" id="follow-btn">
+                ${sim.isFollowing ? '✓ Following' : 'Follow'}
+              </button>
+              <button class="btn ${sim.hasVoted ? 'primary' : ''}" id="vote-btn">
+                <span class="num" id="vote-num">${sim.confidenceCount}</span>
+                <span class="lbl">${sim.hasVoted ? 'You voted confidence' : 'Vote confidence'}</span>
+              </button>
+              <button class="btn" id="share-btn" style="padding: 9px; width: 38px; height: 38px; justify-content: center;" title="Share">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+              </button>
+            </div>
+          </div>
+
+          ${sim.worldCard && sim.worldCard.fields && sim.worldCard.fields.length ? renderWorldCardSection(sim.worldCard) : ''}
+
+          ${sim.entityVitals && sim.entityVitals.length ? renderEntityVitalsSection(sim.entityVitals) : ''}
+
+          <div class="comments-section" id="comments">
+            <h2 class="comments-title">Comments</h2>
+            <div id="comments-list" style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 16px;">
+            </div>
+            <form id="comment-form" style="display: flex; gap: 12px; align-items: flex-start;">
+              <div class="avatar" style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent-deep)); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; flex-shrink: 0;" id="my-avatar">U</div>
+              <div style="flex: 1;">
+                <textarea id="comment-input" placeholder="Add a comment..." style="width: 100%; background: rgba(10, 22, 40, 0.6); border: 1px solid var(--border); color: var(--text); font-family: inherit; font-size: 14px; padding: 12px; border-radius: 12px; resize: none; min-height: 80px; margin-bottom: 8px;" required></textarea>
+                <div style="display: flex; justify-content: flex-end;">
+                  <button type="submit" class="btn primary" style="padding: 8px 16px; font-size: 13px;">Post Comment</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <aside class="activity-sidebar">
+          <h2 class="activity-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+            Activity
+          </h2>
+          <div class="timeline">
+            ${sim.events.length ? sim.events.map(renderEvent).join('') : '<div class="empty">No events yet.</div>'}
+          </div>
+        </aside>
+
+        <nav class="bottom-nav">
+          <button class="btn" onclick="window.history.back()">← Back</button>
+          <button class="btn ${sim.hasVoted ? 'primary' : ''}" id="bottom-vote-btn">
+            ${sim.hasVoted ? 'You Voted' : 'Vote Confidence'}
+          </button>
+          <button class="btn" onclick="document.getElementById('comments').scrollIntoView({behavior: 'smooth'})">Comment</button>
+        </nav>
+      `;
+
+      if (sim.worldCard && sim.worldCard.fields.length) {
+        onWcFieldChange(sim.worldCard.fields[0]);
+      }
+
+      if (sim.entityVitals && sim.entityVitals.length) {
+        evSelectedField = '__agent_market_power';
+        renderEvGrid();
+      }
+
+      document.getElementById('follow-btn').addEventListener('click', async (e) => {
+        const btn = e.currentTarget;
+        btn.disabled = true;
+        try {
+          const r = await fetch(`/api/simulations/${SIM_ID}/follow`, { method: 'POST' });
+          const d = await r.json();
+          if (!r.ok) throw new Error(d.error);
+          sim.isFollowing = d.isFollowing;
+          sim.followerCount = d.followerCount;
+          btn.classList.toggle('primary', d.isFollowing);
+          btn.textContent = d.isFollowing ? '✓ Following' : 'Follow';
+          document.getElementById('fc').textContent = d.followerCount;
+        } catch (err) { alert(err.message); }
+        finally { btn.disabled = false; }
+      });
+
+      const handleVote = async (e) => {
+        const btn = e.currentTarget;
+        const mainVoteBtn = document.getElementById('vote-btn');
+        const bottomVoteBtn = document.getElementById('bottom-vote-btn');
+        
+        mainVoteBtn.disabled = true;
+        bottomVoteBtn.disabled = true;
+        
+        try {
+          const r = await fetch(`/api/simulations/${SIM_ID}/confidence`, { method: 'POST' });
+          const d = await r.json();
+          if (!r.ok) throw new Error(d.error);
+          sim.hasVoted = d.hasVoted;
+          sim.confidenceCount = d.confidenceCount;
+          sim.confidencePct = d.confidencePct;
+          
+          mainVoteBtn.classList.toggle('primary', d.hasVoted);
+          document.getElementById('vote-num').textContent = d.confidenceCount;
+          mainVoteBtn.querySelector('.lbl').textContent = d.hasVoted ? 'You voted confidence' : 'Vote confidence';
+          
+          bottomVoteBtn.classList.toggle('primary', d.hasVoted);
+          bottomVoteBtn.textContent = d.hasVoted ? 'You Voted' : 'Vote Confidence';
+          
+          document.getElementById('cc').textContent = d.confidenceCount;
+          const cp = document.getElementById('cp'); if (cp) cp.textContent = d.confidencePct;
+        } catch (err) { alert(err.message); }
+        finally { 
+          mainVoteBtn.disabled = false;
+          bottomVoteBtn.disabled = false;
+        }
+      };
+
+      document.getElementById('vote-btn').addEventListener('click', handleVote);
+      document.getElementById('bottom-vote-btn').addEventListener('click', handleVote);
+
+      document.getElementById('share-btn')?.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const url = window.location.href;
+        const title = sim.title;
+        if (navigator.share) {
+          try { await navigator.share({ title, url }); } catch (err) {}
+        } else {
+          navigator.clipboard.writeText(url);
+          alert('Link copied to clipboard!');
+        }
+      });
+
+      const myAvatar = document.getElementById('my-avatar');
+      if (myAvatar && meGlobal) {
+        if (mockSettings.profileHidden) {
+          myAvatar.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
+        } else {
+          myAvatar.textContent = `${(meGlobal.firstName || 'U')[0]}${(meGlobal.lastName || '')[0] || ''}`;
+        }
+      }
+      
+      document.getElementById('comment-form')?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const input = document.getElementById('comment-input');
+        if (!input.value.trim() || !meGlobal) return;
+        
+        const isHidden = mockSettings.profileHidden;
+        defaultComments.unshift({
+          id: Date.now(),
+          name: isHidden ? "Private user" : `${meGlobal.firstName} ${meGlobal.lastName}`,
+          title: `${meGlobal.jobTitle} at ${meGlobal.companyName}`,
+          avatar: isHidden ? "?" : `${(meGlobal.firstName || 'U')[0]}${(meGlobal.lastName || '')[0] || ''}`,
+          text: input.value.trim(),
+          timeAgo: "Just now",
+          upvotes: 0,
+          hasUpvoted: false,
+          replies: []
+        });
+        
+        input.value = '';
+        renderComments();
+      });
+
+      renderComments();
+    }
+
+    window.toggleReply = function(id) {
+      replyingToId = replyingToId === id ? null : id;
+      renderComments();
+    };
+    
+    window.reportComment = function(id) {
+      alert("Comment reported. Our moderation team will review it.");
+    };
+
+    window.toggleUpvote = function(id) {
+      const toggleInArray = (arr) => {
+        for (let c of arr) {
+          if (c.id === id) {
+            c.hasUpvoted = !c.hasUpvoted;
+            c.upvotes += c.hasUpvoted ? 1 : -1;
+            return true;
+          }
+          if (c.replies && toggleInArray(c.replies)) return true;
+        }
+        return false;
+      };
+      toggleInArray(defaultComments);
+      renderComments();
+    };
+
+    window.submitReply = function(e, parentId) {
+      e.preventDefault();
+      const input = document.getElementById(`reply-input-${parentId}`);
+      if (!input || !input.value.trim() || !meGlobal) return;
+      
+      const isHidden = mockSettings.profileHidden;
+      const replyObj = {
+        id: Date.now(),
+        name: isHidden ? "Private user" : `${meGlobal.firstName} ${meGlobal.lastName}`,
+        title: `${meGlobal.jobTitle} at ${meGlobal.companyName}`,
+        avatar: isHidden ? "?" : `${(meGlobal.firstName || 'U')[0]}${(meGlobal.lastName || '')[0] || ''}`,
+        text: input.value.trim(),
+        timeAgo: "Just now",
+        upvotes: 0,
+        hasUpvoted: false,
+        replies: []
+      };
+
+      const addToParent = (arr) => {
+        for (let c of arr) {
+          if (c.id === parentId) {
+            c.replies.push(replyObj);
+            return true;
+          }
+          if (c.replies && addToParent(c.replies)) return true;
+        }
+        return false;
+      };
+      addToParent(defaultComments);
+      replyingToId = null;
+      renderComments();
+    };
+
+    function renderCommentTree(commentsList, level = 0) {
+      if (!commentsList || commentsList.length === 0) return '';
+      return commentsList.map(c => `
+        <div style="display: flex; gap: 12px; margin-top: ${level === 0 ? '16px' : '12px'}; margin-left: ${level > 0 ? '48px' : '0'};" id="comment-${c.id}">
+          <div class="avatar" style="width: 36px; height: 36px; border-radius: 50%; background: var(--bg-card); border: 1px solid var(--border); color: var(--text); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0;">${c.avatar === '?' ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' : escapeHtml(c.avatar)}</div>
+          <div style="flex: 1;">
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px;">
+              <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; flex-wrap: wrap;">
+                <strong style="font-size: 14px; color: var(--text);">${escapeHtml(c.name)}</strong>
+                <span style="font-size: 12px; color: var(--text-muted);">${escapeHtml(c.title)}</span>
+                <span style="font-size: 12px; color: var(--text-muted); margin-left: auto;">${escapeHtml(c.timeAgo)}</span>
+              </div>
+              <div style="font-size: 14px; color: var(--text); line-height: 1.5; margin-bottom: 8px;">${escapeHtml(c.text)}</div>
+              
+              <div style="display: flex; gap: 16px; align-items: center;">
+                <button class="comment-action-btn" onclick="toggleUpvote(${c.id})" style="background: none; border: none; color: ${c.hasUpvoted ? 'var(--accent-bright)' : 'var(--text-muted)'}; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 0;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                  ${c.upvotes || 0}
+                </button>
+                <button class="comment-action-btn" onclick="toggleReply(${c.id})" style="background: none; border: none; color: var(--text-muted); font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 0;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                  Reply
+                </button>
+                <button class="comment-action-btn" onclick="reportComment(${c.id})" style="background: none; border: none; color: var(--text-muted); font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 0;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+                  Report
+                </button>
+              </div>
+            </div>
+            
+            ${replyingToId === c.id ? `
+              <form class="reply-form" onsubmit="submitReply(event, ${c.id})" style="margin-top: 12px; display: flex; gap: 8px;">
+                <input type="text" id="reply-input-${c.id}" placeholder="Write a reply..." style="flex: 1; background: rgba(10, 22, 40, 0.6); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 8px; font-size: 13px;" required autofocus>
+                <button type="submit" class="btn primary" style="padding: 6px 12px; font-size: 12px;">Post</button>
+              </form>
+            ` : ''}
+            
+            ${renderCommentTree(c.replies, level + 1)}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderComments() {
+      const list = document.getElementById('comments-list');
+      if (!list) return;
+      if (defaultComments.length === 0) {
+        list.innerHTML = '<div style="color: var(--text-muted); text-align: center; padding: 20px;">No comments yet. Be the first to comment!</div>';
+        return;
+      }
+      
+      list.innerHTML = renderCommentTree(defaultComments, 0);
+    }
+
+    function renderHeaderProfile(me) {
+      const container = document.getElementById('header-profile-container');
+      const fInit = (me.firstName || 'U')[0];
+      const lInit = (me.lastName || '')[0] || '';
+      container.innerHTML = `
+        <div id="header-profile-container" style="display: flex; align-items: center; gap: 16px;">
+          <div class="header-notifications" id="header-notifications-btn" style="position: relative; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; transition: background 0.15s;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            <span style="position: absolute; top: 2px; right: 4px; width: 8px; height: 8px; background: var(--red); border-radius: 50%; border: 2px solid var(--bg-card);"></span>
+            <div class="dropdown-menu" id="header-notifications-dropdown" style="position: absolute; top: 100%; right: -10px; margin-top: 12px; background: rgba(15, 23, 42, 0.95); border: 1px solid var(--border-strong); border-radius: 12px; padding: 12px; width: 300px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 20; cursor: default;">
+              <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); color: var(--text);">Notifications</h3>
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="display: flex; gap: 12px; align-items: flex-start;">
+                  <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0;">AS</div>
+                  <div style="line-height: 1.4;">
+                    <p style="font-size: 13px; color: var(--text); margin-bottom: 4px;"><strong>Alex Sterling</strong> replied to your comment on <em>AI Governance</em>.</p>
+                    <span style="font-size: 11px; color: var(--text-muted);">2 hours ago</span>
+                  </div>
+                </div>
+                <div style="display: flex; gap: 12px; align-items: flex-start;">
+                  <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
+                  <div style="line-height: 1.4;">
+                    <p style="font-size: 13px; color: var(--text); margin-bottom: 4px;">Your WhatIf submission <em>'AI Resource Scarcity'</em> is under review.</p>
+                    <span style="font-size: 11px; color: var(--text-muted);">Yesterday</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="header-profile" id="header-user-menu-btn" style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px 8px; border-radius: 8px; transition: background 0.15s;">
+            <div class="avatar" id="header-avatar-display" style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent-deep)); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px;">${escapeHtml(fInit)}${escapeHtml(lInit)}</div>
+            <div class="menu-container" style="position: relative;">
+              <button class="kebab-btn" style="background: none; border: none; color: var(--text-muted); font-size: 20px; padding: 4px; cursor: pointer; display: flex; align-items: center; pointer-events: none;">&#8942;</button>
+              <div class="dropdown-menu" id="header-user-dropdown" style="position: absolute; top: 100%; right: 0; margin-top: 8px; background: rgba(15, 23, 42, 0.95); border: 1px solid var(--border-strong); border-radius: 10px; padding: 8px 0; min-width: 180px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 20;">
+                <a href="/profile.html" class="dropdown-item" style="display: flex; align-items: center; gap: 10px; padding: 10px 16px; color: var(--text-muted); font-size: 13px; text-decoration: none;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                  Update account
+                </a>
+
+                <a href="#" class="dropdown-item" id="header-logout" style="display: flex; align-items: center; gap: 10px; padding: 10px 16px; color: var(--red); font-size: 13px; text-decoration: none;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                  Sign out
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('header-user-menu-btn')?.addEventListener('click', (e) => {
+        if (e.target.closest('#header-user-dropdown')) return;
+        e.stopPropagation();
+        document.getElementById('header-user-dropdown').classList.toggle('show');
+        document.getElementById('header-notifications-dropdown')?.classList.remove('show');
+      });
+      document.getElementById('header-notifications-btn')?.addEventListener('click', (e) => {
+        if (e.target.closest('#header-notifications-dropdown')) return;
+        e.stopPropagation();
+        document.getElementById('header-notifications-dropdown').classList.toggle('show');
+        document.getElementById('header-user-dropdown')?.classList.remove('show');
+      });
+      document.addEventListener('click', () => {
+        document.getElementById('header-user-dropdown')?.classList.remove('show');
+        document.getElementById('header-notifications-dropdown')?.classList.remove('show');
+      });
+      document.getElementById('header-logout')?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        await fetch('/api/auth/logout', { method: 'POST' });
+        window.location.href = '/';
+      });
+    }
+
+    function fieldLabel(key) {
+      // Convert "Ai Capability" → "AI Capability", "Us China Ai Gap" → "US China AI Gap", etc.
+      return key
+        .replace(/\bAi\b/g, 'AI').replace(/\bUs\b/g, 'US').replace(/\bGdp\b/g, 'GDP')
+        .replace(/\bGpu\b/g, 'GPU').replace(/\bGw\b/g, 'GW').replace(/\bPct\b/g, '%')
+        .replace(/\bYoy\b/g, 'YoY');
+    }
+
+    function renderWorldCardSection(wc) {
+      const options = wc.fields.map(f =>
+        `<option value="${escapeHtml(f)}">${escapeHtml(fieldLabel(f))}</option>`
+      ).join('');
+      return `
+        <div class="chart-card" id="world-card-section">
+          <div class="chart-head" style="margin-bottom:14px;">
+            <h2 style="display:flex;align-items:center;gap:8px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              World Card
+            </h2>
+            <span style="font-size:13px;color:var(--text-muted);">${wc.fields.length} metrics · ${wc.ticks.length} ticks</span>
+          </div>
+          <select class="wc-field-select" id="wc-field-select" onchange="onWcFieldChange(this.value)">
+            ${options}
+          </select>
+          <div class="wc-stat-row" id="wc-stats"></div>
+          <div id="wc-chart" style="width:100%;height:240px;position:relative;cursor:pointer;"></div>
+          <div id="wc-tick-context" style="display:none;margin-top:16px;border-top:1px solid var(--border);padding-top:16px;"></div>
+          <table class="wc-tick-table" id="wc-table" style="margin-top:16px;">
+            <thead><tr><th>Tick</th><th>Date</th><th id="wc-th-val">Value</th><th>Δ vs prev</th></tr></thead>
+            <tbody id="wc-tbody"></tbody>
+          </table>
+        </div>`;
+    }
+
+    function onWcFieldChange(field) {
+      if (!sim.worldCard) return;
+      const wc = sim.worldCard;
+      const ticks = wc.ticks;
+      const vals  = ticks.map(t => t.values[field]);
+
+      // Stats: first, last, min, max, change
+      const first = vals[0], last = vals[vals.length - 1];
+      const change = last - first;
+      const changeClass = change > 0 ? 'up' : change < 0 ? 'down' : '';
+      const min = Math.min(...vals), max = Math.max(...vals);
+
+      document.getElementById('wc-stats').innerHTML = `
+        <div class="wc-stat"><div class="wc-stat-label">Current (T${ticks[ticks.length-1].tick})</div><div class="wc-stat-value">${fmt(last, field)}</div></div>
+        <div class="wc-stat"><div class="wc-stat-label">Start (T0)</div><div class="wc-stat-value">${fmt(first, field)}</div></div>
+        <div class="wc-stat"><div class="wc-stat-label">Total change</div><div class="wc-stat-value ${changeClass}">${change > 0 ? '+' : ''}${fmt(change, field)}</div></div>
+        <div class="wc-stat"><div class="wc-stat-label">Min / Max</div><div class="wc-stat-value" style="font-size:15px;">${fmt(min,field)} / ${fmt(max,field)}</div></div>
+      `;
+
+      // Tick table
+      document.getElementById('wc-th-val').textContent = fieldLabel(field);
+      const tbody = document.getElementById('wc-tbody');
+      tbody.innerHTML = ticks.map((t, i) => {
+        const v = t.values[field];
+        const prev = i > 0 ? ticks[i-1].values[field] : null;
+        const delta = prev !== null ? v - prev : null;
+        const dClass = delta === null ? '' : delta > 0 ? 'up' : delta < 0 ? 'down' : 'flat';
+        const dText  = delta === null ? '—' : (delta > 0 ? '+' : '') + fmt(delta, field);
+        return `<tr>
+          <td>T${t.tick}</td>
+          <td>${new Date(t.t).toLocaleDateString(undefined,{month:'short',year:'numeric'})}</td>
+          <td>${fmt(v, field)}</td>
+          <td class="delta ${dClass}">${dText}</td>
+        </tr>`;
+      }).join('');
+
+      // Chart
+      drawWorldCardChart(document.getElementById('wc-chart'), ticks, field, vals);
+    }
+
+    function fmt(v, field) {
+      if (v === null || v === undefined) return '—';
+      if (field === 'Nasdaq Index') return v.toLocaleString();
+      if (field === 'Interest Rates') return v.toFixed(3) + '%';
+      if (Math.abs(v) < 10 && v % 1 !== 0) return v.toFixed(3);
+      if (v % 1 !== 0) return v.toFixed(1);
+      return v.toString();
+    }
+
+    let wcSelectedTick = null;
+
+    function drawWorldCardChart(container, ticks, field, vals) {
+      const w = 1000, h = 240, padL = 50, padR = 16, padT = 16, padB = 40;
+      const minV = Math.min(...vals), maxV = Math.max(...vals);
+      const range = maxV - minV || 1;
+      const xOf = i => padL + (i / (ticks.length - 1)) * (w - padL - padR);
+      const yOf = v => h - padB - ((v - minV) / range) * (h - padT - padB);
+
+      const gridVals = [minV, minV + range * 0.25, minV + range * 0.5, minV + range * 0.75, maxV];
+      const grid = gridVals.map(v => `
+        <line x1="${padL}" x2="${w - padR}" y1="${yOf(v).toFixed(1)}" y2="${yOf(v).toFixed(1)}" stroke="rgba(96,165,250,0.08)" stroke-width="1"/>
+        <text x="${padL - 6}" y="${(yOf(v) + 4).toFixed(1)}" fill="#94a3b8" font-size="10" text-anchor="end">${fmt(v, field)}</text>
+      `).join('');
+
+      const xLabels = ticks.map((t, i) => `
+        <text x="${xOf(i).toFixed(1)}" y="${h - padB + 16}" fill="#94a3b8" font-size="11" text-anchor="middle">T${t.tick}</text>
+      `).join('');
+
+      const pts = vals.map((v, i) => `${i === 0 ? 'M' : 'L'}${xOf(i).toFixed(1)},${yOf(v).toFixed(1)}`).join(' ');
+      const area = `${pts} L${xOf(ticks.length-1)},${h - padB} L${xOf(0)},${h - padB} Z`;
+
+      // Dots — highlight selected tick
+      const dots = vals.map((v, i) => {
+        const sel = wcSelectedTick === i;
+        return `<circle class="wc-dot" data-i="${i}" cx="${xOf(i).toFixed(1)}" cy="${yOf(v).toFixed(1)}" r="${sel ? 7 : 5}" fill="${sel ? '#fff' : 'var(--accent-bright)'}" stroke="${sel ? 'var(--accent-bright)' : 'rgba(10,22,40,0.8)'}" stroke-width="2" style="cursor:pointer;"/>`;
+      }).join('');
+
+      container.innerHTML = `
+        <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="width:100%;height:100%;display:block;">
+          <defs>
+            <linearGradient id="wcg" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color="#60a5fa" stop-opacity="0.4"/>
+              <stop offset="100%" stop-color="#60a5fa" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          ${grid}${xLabels}
+          <path d="${area}" fill="url(#wcg)"/>
+          <path d="${pts}" fill="none" stroke="#60a5fa" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+          ${dots}
+        </svg>`;
+
+      // Click on dot → show tick context
+      container.querySelectorAll('.wc-dot').forEach(dot => {
+        dot.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const i = parseInt(dot.dataset.i);
+          wcSelectedTick = wcSelectedTick === i ? null : i;
+          // Redraw with new selection
+          drawWorldCardChart(container, ticks, field, vals);
+          renderTickContext(i);
+        });
+      });
+    }
+
+    function renderTickContext(tickIdx) {
+      const panel = document.getElementById('wc-tick-context');
+      if (!panel) return;
+      if (wcSelectedTick === null) { panel.style.display = 'none'; return; }
+      const tick = sim.worldCard.ticks[tickIdx];
+      if (!tick) return;
+
+      const date = new Date(tick.t).toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+      const outcomes = tick.agentOutcomes || [];
+      const summary  = tick.landscapeSummary || '';
+
+      panel.style.display = 'block';
+      panel.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div style="font-size:14px;font-weight:700;color:var(--text);">Tick ${tick.tick} — ${date}</div>
+          <button onclick="wcSelectedTick=null;document.getElementById('wc-tick-context').style.display='none';" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;line-height:1;">×</button>
+        </div>
+        ${summary ? `
+          <div style="font-size:13px;color:var(--text-muted);line-height:1.7;margin-bottom:${outcomes.length ? '16px' : '0'};padding:12px 14px;background:rgba(96,165,250,0.05);border:1px solid var(--border);border-radius:10px;">
+            ${escapeHtml(summary)}
+          </div>` : ''}
+        ${outcomes.length ? `
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-muted);margin-bottom:8px;">Agent Outcomes</div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            ${outcomes.map(o => {
+              const colon = o.indexOf(':');
+              const name = colon > -1 ? o.slice(0, colon) : '';
+              const body = colon > -1 ? o.slice(colon + 1).trim() : o;
+              return `<div style="padding:10px 12px;background:rgba(15,23,42,0.7);border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.6;">
+                ${name ? `<span style="font-weight:600;color:var(--accent-bright);">${escapeHtml(name)}:</span> ` : ''}${escapeHtml(body)}
+              </div>`;
+            }).join('')}
+          </div>` : ''}
+      `;
+    }
+
+    // ─── Entity Vitals ───────────────────────────────────────────────────────
+
+    let evSelectedField = null;
+    let evFilter = 'all'; // 'all' | 'agents' | 'meta'
+
+    function renderEntityVitalsSection(entities) {
+      return `
+        <div class="chart-card ev-section" id="entity-vitals-section">
+          <div class="ev-header">
+            <h2>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:6px;"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
+              Entity Vitals
+            </h2>
+            <div class="ev-controls">
+              <select class="ev-field-select" id="ev-field-select" onchange="onEvFieldChange(this.value)">
+                <option value="__agent_market_power">Market Power (Companies)</option>
+                <option value="__agent_technical_edge">Technical Edge (Companies)</option>
+                <option value="__agent_momentum">Momentum (Companies)</option>
+                <option value="__meta_pressure">Pressure (Market Factors)</option>
+                <option value="__meta_volatility">Volatility (Market Factors)</option>
+                <option value="__meta_momentum">Momentum (Market Factors)</option>
+                <option value="__all_momentum">Momentum (All)</option>
+              </select>
+              <select class="ev-filter-select" id="ev-filter-select" onchange="onEvFilterChange(this.value)">
+                <option value="all">All entities</option>
+                <option value="agents">Companies only</option>
+                <option value="meta">Market factors only</option>
+              </select>
+            </div>
+          </div>
+          <div class="ev-grid" id="ev-grid"></div>
+        </div>`;
+    }
+
+    function onEvFieldChange(val) {
+      evSelectedField = val;
+      // Auto-align filter with field choice
+      if (val.startsWith('__agent_') && evFilter === 'meta') {
+        evFilter = 'agents';
+        document.getElementById('ev-filter-select').value = 'agents';
+      } else if (val.startsWith('__meta_') && evFilter === 'agents') {
+        evFilter = 'meta';
+        document.getElementById('ev-filter-select').value = 'meta';
+      }
+      renderEvGrid();
+    }
+
+    function onEvFilterChange(val) {
+      evFilter = val;
+      renderEvGrid();
+    }
+
+    function evGetVital(entity, fieldKey) {
+      // fieldKey: "__agent_market_power" etc → extract field name
+      const isMeta = entity.isMeta;
+      let field = fieldKey.replace(/^__(agent|meta|all)_/, '');
+      // For __all_momentum just use momentum regardless of type
+      if (fieldKey === '__all_momentum') field = 'momentum';
+      return entity.ticks.map(t => t[field] ?? null);
+    }
+
+    function evScoreClass(v) {
+      if (v === null) return 'na';
+      if (v >= 70) return 'high';
+      if (v >= 40) return 'medium';
+      return 'low';
+    }
+
+    function evSparkline(vals, scoreClass) {
+      const filtered = vals.filter(v => v !== null);
+      if (filtered.length < 2) return '';
+      const mn = Math.min(...filtered), mx = Math.max(...filtered);
+      const range = mx - mn || 1;
+      const W = 160, H = 28, pad = 3;
+      const pts = vals.map((v, i) => {
+        const x = pad + (i / (vals.length - 1)) * (W - 2 * pad);
+        const y = v === null ? null : H - pad - ((v - mn) / range) * (H - 2 * pad);
+        return { x, y };
+      }).filter(p => p.y !== null);
+      const color = scoreClass === 'high' ? '#34d399' : scoreClass === 'low' ? '#fb7185' : '#60a5fa';
+      const polyline = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+      return `<svg class="ev-spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+        <path d="${polyline}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+        <circle cx="${pts[pts.length-1].x.toFixed(1)}" cy="${pts[pts.length-1].y.toFixed(1)}" r="2.5" fill="${color}"/>
+      </svg>`;
+    }
+
+    function renderEvGrid() {
+      const grid = document.getElementById('ev-grid');
+      if (!grid || !sim.entityVitals) return;
+
+      const field = evSelectedField || '__agent_market_power';
+      let entities = sim.entityVitals;
+
+      // Filter
+      if (evFilter === 'agents') entities = entities.filter(e => !e.isMeta);
+      else if (evFilter === 'meta')   entities = entities.filter(e => e.isMeta);
+
+      // For __agent_* fields, skip meta entities (they have no value)
+      if (field.startsWith('__agent_')) entities = entities.filter(e => !e.isMeta);
+      if (field.startsWith('__meta_'))  entities = entities.filter(e => e.isMeta);
+
+      // Sort by current (last tick) value descending
+      entities = entities.slice().sort((a, b) => {
+        const av = evGetVital(a, field); const bv = evGetVital(b, field);
+        const ac = av.filter(v => v !== null); const bc = bv.filter(v => v !== null);
+        return (bc[bc.length-1] ?? -1) - (ac[ac.length-1] ?? -1);
+      });
+
+      if (!entities.length) {
+        grid.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:16px 0;">No data for this selection.</div>';
+        return;
+      }
+
+      grid.innerHTML = entities.map(entity => {
+        const vals = evGetVital(entity, field);
+        const nonNull = vals.filter(v => v !== null);
+        const current = nonNull[nonNull.length - 1] ?? null;
+        const prev    = nonNull[nonNull.length - 2] ?? null;
+        const delta   = (current !== null && prev !== null) ? current - prev : null;
+        const sc      = evScoreClass(current);
+        const deltaStr = delta === null ? '' : (delta > 0 ? `+${delta}` : `${delta}`);
+        const deltaClass = delta === null ? 'flat' : delta > 0 ? 'up' : delta < 0 ? 'down' : 'flat';
+        const sparkHtml = evSparkline(vals, sc);
+        const barPct = current !== null ? current : 0;
+
+        return `<div class="ev-card">
+          <div class="ev-card-top">
+            <div class="ev-card-name">${escapeHtml(entity.name)}</div>
+            <span class="ev-badge ${entity.isMeta ? 'meta' : 'agent'}">${entity.isMeta ? 'Factor' : 'Co.'}</span>
+          </div>
+          <div class="ev-score-row">
+            <span class="ev-score ${sc}">${current !== null ? current : '—'}</span>
+            ${delta !== null ? `<span class="ev-delta ${deltaClass}">${deltaStr}</span>` : ''}
+          </div>
+          ${sparkHtml}
+          <div class="ev-bar-bg"><div class="ev-bar-fill ${sc}" style="width:${barPct}%"></div></div>
+        </div>`;
+      }).join('');
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+
+    function renderEvent(e) {
+      const impact = (e.impact || 'neutral').toLowerCase();
+      const arrow = impact === 'up' ? '↑' : impact === 'down' ? '↓' : '·';
+      return `
+        <div class="event ${impact}">
+          <div class="impact-icon">${arrow}</div>
+          <div class="body">
+            <div class="ev-head">
+              <span class="ev-title">${escapeHtml(e.title)}</span>
+              ${e.branchedNewPossibility ? '<span class="branch-tag">New possibility</span>' : ''}
+              <span class="ev-time">${formatDate(e.timestamp)}</span>
+            </div>
+            <div class="ev-desc">${escapeHtml(e.description || '')}</div>
+          </div>
+        </div>`;
+    }
+
+    // --- Agent dropdown / timeline visibility ---
+    const hiddenTimelines = new Set();
+
+    function redrawChart() {
+      const container = document.getElementById('big-chart');
+      if (container) renderBigChart(container, sim.trajectory, sim.events, sim.timelines || []);
+    }
+
+    function updateDropdownLabel() {
+      const total = (sim.timelines || []).length;
+      const visible = total - hiddenTimelines.size;
+      const lbl = document.getElementById('agent-btn-label');
+      if (lbl) lbl.textContent = visible === total ? `All ${total} agents shown` : `${visible} / ${total} agents shown`;
+    }
+
+    window.onAgentCheckChange = function(cb) {
+      const id = cb.dataset.agent;
+      if (cb.checked) hiddenTimelines.delete(id);
+      else hiddenTimelines.add(id);
+      redrawChart();
+      updateDropdownLabel();
+    };
+
+    window.selectAllAgents = function() {
+      hiddenTimelines.clear();
+      document.querySelectorAll('#agent-list input[type=checkbox]').forEach(cb => { cb.checked = true; });
+      redrawChart(); updateDropdownLabel();
+    };
+
+    window.selectNoAgents = function() {
+      (sim.timelines || []).forEach(tl => hiddenTimelines.add(tl.agentId));
+      document.querySelectorAll('#agent-list input[type=checkbox]').forEach(cb => { cb.checked = false; });
+      redrawChart(); updateDropdownLabel();
+    };
+
+    window.selectTopAgents = function(n) {
+      // rank real agents only (not meta-* market factors) by final tick momentum value descending
+      const allTimelines = sim.timelines || [];
+      const realAgents = allTimelines.filter(tl => !isMarketFactor(tl.agentId));
+      const metaFactors = allTimelines.filter(tl => isMarketFactor(tl.agentId));
+      const ranked = [...realAgents].sort((a, b) => {
+        const av = a.trajectory[a.trajectory.length - 1]?.value || 0;
+        const bv = b.trajectory[b.trajectory.length - 1]?.value || 0;
+        return bv - av;
+      });
+      hiddenTimelines.clear();
+      // hide real agents outside top-n; always hide meta factors
+      ranked.forEach((tl, i) => { if (i >= n) hiddenTimelines.add(tl.agentId); });
+      metaFactors.forEach(tl => hiddenTimelines.add(tl.agentId));
+      document.querySelectorAll('#agent-list input[type=checkbox]').forEach(cb => {
+        cb.checked = !hiddenTimelines.has(cb.dataset.agent);
+      });
+      redrawChart(); updateDropdownLabel();
+    };
+
+    window.filterAgentList = function() {
+      const q = (document.getElementById('agent-search')?.value || '').toLowerCase();
+      document.querySelectorAll('#agent-list label[data-name]').forEach(el => {
+        el.style.display = el.dataset.name.includes(q) ? '' : 'none';
+      });
+    };
+
+    // Wire up dropdown open/close after render
+    function wireDropdown() {
+      const btn = document.getElementById('agent-dropdown-btn');
+      const panel = document.getElementById('agent-dropdown-panel');
+      if (!btn || !panel) return;
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const open = panel.style.display === 'block';
+        panel.style.display = open ? 'none' : 'block';
+        if (!open) document.getElementById('agent-search')?.focus();
+      });
+      document.addEventListener('click', (e) => {
+        if (!document.getElementById('agent-selector')?.contains(e.target)) {
+          panel.style.display = 'none';
+        }
+      });
+    }
+
+    // --- Big chart renderer with optional multi-agent timelines ---
+    function renderBigChart(container, points, events, timelines) {
+      const w = 1000, h = 340, padL = 40, padR = 16, padT = 16, padB = 48;
+      const isMulti = timelines && timelines.length > 0;
+
+      // Collect all points to determine time range
+      const allPoints = isMulti
+        ? timelines.flatMap(tl => tl.trajectory)
+        : points;
+      if (!allPoints.length) return;
+
+      container.style.position = 'relative';
+
+      const tMin = Math.min(...allPoints.map(p => new Date(p.t).getTime()));
+      const tMax = Math.max(...allPoints.map(p => new Date(p.t).getTime()));
+      const xOf = (t) => padL + ((new Date(t).getTime() - tMin) / Math.max(tMax - tMin, 1)) * (w - padL - padR);
+      const yOf = (v) => h - padB - v * (h - padT - padB);
+
+      const gridLines = [0, 0.25, 0.5, 0.75, 1].map(v => `
+        <line x1="${padL}" x2="${w - padR}" y1="${yOf(v)}" y2="${yOf(v)}" stroke="rgba(96,165,250,0.08)" stroke-width="1"/>
+        <text x="${padL - 8}" y="${yOf(v) + 4}" fill="#94a3b8" font-size="11" text-anchor="end">${Math.round(v * 100)}%</text>
+      `).join('');
+
+      // X-axis: emit a label for each unique year that falls within the range
+      const startYear = new Date(tMin).getFullYear();
+      const endYear   = new Date(tMax).getFullYear();
+      const xAxisLabels = [];
+      for (let yr = startYear; yr <= endYear; yr++) {
+        const ts = new Date(`${yr}-01-01T00:00:00.000Z`).getTime();
+        if (ts < tMin || ts > tMax) continue;
+        const x = xOf(ts);
+        xAxisLabels.push(`
+          <line x1="${x}" x2="${x}" y1="${h - padB}" y2="${h - padB + 4}" stroke="rgba(96,165,250,0.3)" stroke-width="1"/>
+          <text x="${x}" y="${h - padB + 16}" fill="#94a3b8" font-size="11" text-anchor="middle">${yr}</text>
+        `);
+      }
+      // Also label the very start date (month + year) if it isn't Jan
+      const startDate = new Date(tMin);
+      if (startDate.getMonth() !== 0) {
+        xAxisLabels.unshift(`
+          <text x="${padL}" y="${h - padB + 16}" fill="#64748b" font-size="10" text-anchor="start">${startDate.toLocaleDateString(undefined,{month:'short',year:'numeric'})}</text>
+        `);
+      }
+      const xAxis = xAxisLabels.join('');
+
+      const eventMarkers = events.map(e => {
+        const x = xOf(e.timestamp);
+        const color = e.impact === 'up' ? '#34d399' : e.impact === 'down' ? '#fb7185' : '#94a3b8';
+        return `
+          <line x1="${x}" x2="${x}" y1="${padT}" y2="${h - padB}" stroke="${color}" stroke-width="1" stroke-dasharray="3,4" opacity="0.45"/>
+          <circle cx="${x}" cy="${padT + 4}" r="4" fill="${color}"><title>${escapeAttr(e.title)} — ${formatDate(e.timestamp)}</title></circle>
+        `;
+      }).join('');
+
+      let seriesSvg = '';
+      if (isMulti) {
+        timelines.forEach(tl => {
+          if (hiddenTimelines.has(tl.agentId) || !tl.trajectory.length) return;
+          const pts = tl.trajectory;
+          const line = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${xOf(p.t).toFixed(1)},${yOf(p.value).toFixed(1)}`).join(' ');
+          const last = pts[pts.length - 1];
+          seriesSvg += `
+            <path d="${line}" fill="none" stroke="${tl.color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" opacity="0.9"/>
+            <circle cx="${xOf(last.t).toFixed(1)}" cy="${yOf(last.value).toFixed(1)}" r="5" fill="${tl.color}" filter="drop-shadow(0 0 6px ${tl.color})"/>
+          `;
+        });
+      } else {
+        const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${xOf(p.t).toFixed(1)},${yOf(p.value).toFixed(1)}`).join(' ');
+        const areaPath = `${linePath} L${xOf(points[points.length - 1].t)},${h - padB} L${xOf(points[0].t)},${h - padB} Z`;
+        seriesSvg = `
+          <path d="${areaPath}" fill="url(#g-big)"/>
+          <path d="${linePath}" fill="none" stroke="#60a5fa" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" filter="drop-shadow(0 4px 6px rgba(96,165,250,0.3))"/>
+          <circle cx="${xOf(points[points.length - 1].t).toFixed(1)}" cy="${yOf(points[points.length - 1].value).toFixed(1)}" r="5" fill="#60a5fa" filter="drop-shadow(0 0 8px rgba(96,165,250,0.8))"/>
+        `;
+      }
+
+      container.innerHTML = `
+        <div class="chart-crosshair" id="chart-crosshair"></div>
+        <div class="chart-tooltip" id="chart-tooltip">
+          <div class="tt-date" id="tt-date"></div>
+          <div class="tt-val" id="tt-val"></div>
+          <div id="tt-events" style="margin-top: 6px; font-size: 11px; color: var(--text-muted); display: none;"></div>
+        </div>
+        <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="width:100%;height:100%;display:block;">
+          <defs>
+            <linearGradient id="g-big" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color="#60a5fa" stop-opacity="0.6"/>
+              <stop offset="50%" stop-color="#3b82f6" stop-opacity="0.2"/>
+              <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          ${gridLines}
+          ${xAxis}
+          ${eventMarkers}
+          ${seriesSvg}
+        </svg>`;
+
+      const svg = container.querySelector('svg');
+      const tooltip = container.querySelector('#chart-tooltip');
+      const crosshair = container.querySelector('#chart-crosshair');
+      const ttDate = container.querySelector('#tt-date');
+      const ttVal = container.querySelector('#tt-val');
+      const ttEvents = container.querySelector('#tt-events');
+
+      // For hover: use main trajectory points for snapping (or first timeline if multi)
+      const snapPoints = isMulti ? (timelines[0]?.trajectory || []) : points;
+
+      container.addEventListener('mousemove', (e) => {
+        const rect = svg.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const svgW = rect.width;
+        const wRatio = w / svgW;
+        const chartX = mouseX * wRatio;
+
+        if (chartX < padL || chartX > w - padR) {
+          tooltip.classList.remove('show');
+          crosshair.style.opacity = '0';
+          return;
+        }
+
+        const tRatio = (chartX - padL) / (w - padL - padR);
+        const hoverT = tMin + tRatio * (tMax - tMin);
+
+        let closest = snapPoints[0];
+        let minDist = Infinity;
+        for (const p of snapPoints) {
+          const dist = Math.abs(new Date(p.t).getTime() - hoverT);
+          if (dist < minDist) { minDist = dist; closest = p; }
+        }
+
+        const ptTime = new Date(closest.t).getTime();
+
+        if (isMulti) {
+          // Show each visible agent's value at this tick
+          const rows = timelines
+            .filter(tl => !hiddenTimelines.has(tl.agentId))
+            .map(tl => {
+              const match = tl.trajectory.reduce((best, p) => {
+                const d = Math.abs(new Date(p.t).getTime() - ptTime);
+                return d < Math.abs(new Date(best.t).getTime() - ptTime) ? p : best;
+              }, tl.trajectory[0] || { t: closest.t, value: 0 });
+              return `<div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
+                <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${tl.color};flex-shrink:0;"></span>
+                <span style="font-size:12px;color:var(--text-muted);flex:1;">${escapeHtml(tl.agentName)}</span>
+                <span style="font-size:13px;font-weight:700;color:${tl.color};">${Math.round(match.value * 100)}%</span>
+              </div>`;
+            }).join('');
+          ttDate.textContent = formatDate(closest.t);
+          ttVal.textContent = '';
+          ttEvents.style.display = 'block';
+          ttEvents.innerHTML = rows;
+        } else {
+          const nearEvents = events.filter(ev => Math.abs(new Date(ev.timestamp).getTime() - ptTime) < (24 * 60 * 60 * 1000));
+          ttDate.textContent = formatDate(closest.t);
+          ttVal.textContent = Math.round(closest.value * 100) + '%';
+          if (nearEvents.length > 0) {
+            ttEvents.style.display = 'block';
+            ttEvents.innerHTML = nearEvents.map(ev => `<div style="margin-top: 4px;">• ${escapeHtml(ev.title)}</div>`).join('');
+          } else {
+            ttEvents.style.display = 'none';
+          }
+        }
+
+        tooltip.classList.add('show');
+        crosshair.style.opacity = '1';
+
+        const pxPercent = (new Date(closest.t).getTime() - tMin) / Math.max(tMax - tMin, 1);
+        const actualPadL = padL * (svgW / w);
+        const actualPadR = padR * (svgW / w);
+        const lineX = actualPadL + pxPercent * (svgW - actualPadL - actualPadR);
+        crosshair.style.left = lineX + 'px';
+
+        let ttLeft = mouseX + 16;
+        if (ttLeft + 200 > rect.width) ttLeft = mouseX - 210;
+        tooltip.style.left = ttLeft + 'px';
+        tooltip.style.top = Math.max(0, e.clientY - rect.top - 20) + 'px';
+      });
+
+      container.addEventListener('mouseleave', () => {
+        tooltip.classList.remove('show');
+        crosshair.style.opacity = '0';
+      });
+    }
+
+    function formatDate(d) {
+      const dt = new Date(d);
+      return dt.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    }
+    function escapeHtml(s) {
+      return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+    function escapeAttr(s) { return escapeHtml(s); }
+  </script>
+</body>
+</html>

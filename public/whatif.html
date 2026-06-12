@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Run a What-If — Principle Scenarios</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #0a1628;
+      --bg-card: rgba(15, 23, 42, 0.8);
+      --border: rgba(96, 165, 250, 0.15);
+      --border-strong: rgba(96, 165, 250, 0.4);
+      --text: #e8edf5;
+      --text-muted: #94a3b8;
+      --accent: #3b82f6;
+      --accent-bright: #60a5fa;
+      --accent-deep: #2563eb;
+      --green: #22c55e;
+      --red: #ef4444;
+      --yellow: #fbbf24;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      background: radial-gradient(ellipse at top, #0e1f3a 0%, var(--bg) 60%);
+      background-attachment: fixed;
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+    a { color: var(--accent-bright); text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; }
+
+    header {
+      position: sticky; top: 0; z-index: 10;
+      background: rgba(10, 22, 40, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+    }
+    .nav-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .brand { font-weight: 700; font-size: 18px; display: flex; align-items: center; gap: 10px; }
+    .brand .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent-bright); box-shadow: 0 0 12px var(--accent-bright); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .nav-links { display: flex; gap: 8px; align-items: center; }
+    .nav-links a { padding: 8px 14px; border-radius: 8px; color: var(--text-muted); font-size: 14px; font-weight: 500; }
+    .nav-links a:hover, .nav-links a.active { background: rgba(59, 130, 246, 0.15); color: var(--text); }
+
+    main { max-width: 760px; margin: 0 auto; padding: 32px 24px 80px; }
+    h1.page-title { font-size: 28px; font-weight: 700; margin-bottom: 6px; }
+    .page-sub { color: var(--text-muted); margin-bottom: 28px; font-size: 14px; max-width: 580px; }
+
+    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 28px; backdrop-filter: blur(10px); }
+    .form-row { margin-bottom: 18px; }
+    label { display: block; font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+    .hint { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+    input[type=text], input[type=url], textarea {
+      width: 100%; background: rgba(10, 22, 40, 0.6);
+      border: 1px solid var(--border);
+      color: var(--text); font-family: inherit; font-size: 14px;
+      padding: 11px 13px; border-radius: 8px; resize: vertical;
+      transition: border-color 0.15s;
+    }
+    textarea { min-height: 80px; }
+    input:focus, textarea:focus { outline: none; border-color: var(--accent-bright); }
+    .counter { float: right; font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+    .counter.warn { color: var(--yellow); }
+    .counter.over { color: var(--red); }
+    .submit-btn {
+      background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+      border: none; color: white;
+      padding: 12px 24px; border-radius: 10px;
+      font-size: 15px; font-weight: 600;
+      transition: transform 0.1s, box-shadow 0.15s;
+    }
+    .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px -6px rgba(59, 130, 246, 0.6); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+    .err { color: var(--red); font-size: 13px; margin-top: 12px; min-height: 18px; }
+
+    .thanks { text-align: center; padding: 30px 20px; }
+    .thanks .check {
+      width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 18px;
+      background: rgba(34, 197, 94, 0.15); color: var(--green);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px;
+    }
+    .thanks h2 { font-size: 22px; margin-bottom: 8px; }
+    .thanks p { color: var(--text-muted); font-size: 14px; max-width: 460px; margin: 0 auto 20px; }
+
+    .past-list { margin-top: 32px; }
+    .past-list h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 12px; }
+    .past-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 10px; padding: 14px 16px;
+      backdrop-filter: blur(10px);
+      margin-bottom: 10px;
+    }
+    .past-item .ph { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 4px; }
+    .past-item .pt { font-size: 14px; font-weight: 600; }
+    .past-item .pd { font-size: 12px; color: var(--text-muted); }
+    .past-item .pdesc { font-size: 13px; color: var(--text-muted); }
+    .status-badge { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; padding: 3px 8px; border-radius: 999px; }
+    .status-badge.pending { background: rgba(251, 191, 36, 0.15); color: var(--yellow); }
+    .status-badge.shortlisted { background: rgba(34, 197, 94, 0.15); color: var(--green); }
+    .status-badge.rejected { background: rgba(148, 163, 184, 0.15); color: var(--text-muted); }
+
+    .empty { text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav-inner">
+      <a href="/" class="brand" style="text-decoration: none; color: inherit;"><span class="dot"></span> Principle Scenarios</a>
+      <div id="header-profile-container" style="display: flex; align-items: center; gap: 16px;"></div>
+    </div>
+  </header>
+
+  <main id="content">
+    <div class="empty">Loading…</div>
+  </main>
+
+  <script>
+    const content = document.getElementById('content');
+
+    let state = { me: null };
+
+    init();
+    async function init() {
+      try {
+        const meRes = await fetch('/api/me');
+        if (!meRes.ok) {
+          window.location.href = '/';
+          return;
+        }
+        const data = await meRes.json();
+        state.me = data.member;
+        
+        // Render header
+        const fInit = (state.me.firstName || 'U')[0];
+        const lInit = (state.me.lastName || '')[0] || '';
+        document.getElementById('header-profile-container').innerHTML = `
+          <div class="header-notifications" id="header-notifications-btn" style="position: relative; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; transition: background 0.15s;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            <span style="position: absolute; top: 2px; right: 4px; width: 8px; height: 8px; background: var(--red); border-radius: 50%; border: 2px solid var(--bg-card);"></span>
+            <div class="dropdown-menu" id="header-notifications-dropdown" style="position: absolute; top: 100%; right: -10px; margin-top: 12px; background: rgba(15, 23, 42, 0.95); border: 1px solid var(--border-strong); border-radius: 12px; padding: 12px; width: 300px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 20; cursor: default; display: none;">
+              <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); color: var(--text);">Notifications</h3>
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="display: flex; gap: 12px; align-items: flex-start;">
+                  <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0;">AS</div>
+                  <div style="line-height: 1.4;">
+                    <p style="font-size: 13px; color: var(--text); margin-bottom: 4px;"><strong>Alex Sterling</strong> replied to your comment on <em>AI Governance</em>.</p>
+                    <span style="font-size: 11px; color: var(--text-muted);">2 hours ago</span>
+                  </div>
+                </div>
+                <div style="display: flex; gap: 12px; align-items: flex-start;">
+                  <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
+                  <div style="line-height: 1.4;">
+                    <p style="font-size: 13px; color: var(--text); margin-bottom: 4px;">Your WhatIf submission <em>'AI Resource Scarcity'</em> is under review.</p>
+                    <span style="font-size: 11px; color: var(--text-muted);">Yesterday</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="header-profile" id="header-user-menu-btn" style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px 8px; border-radius: 8px; transition: background 0.15s;">
+            <div class="avatar" id="header-avatar-display" style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent-deep)); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px;">${escapeHtml(fInit)}${escapeHtml(lInit)}</div>
+            <div class="menu-container" style="position: relative;">
+              <button class="kebab-btn" style="background: none; border: none; color: var(--text-muted); font-size: 20px; padding: 4px; cursor: pointer; display: flex; align-items: center; pointer-events: none;">&#8942;</button>
+              <div class="dropdown-menu" id="header-user-dropdown" style="position: absolute; top: 100%; right: 0; margin-top: 8px; background: rgba(15, 23, 42, 0.95); border: 1px solid var(--border-strong); border-radius: 10px; padding: 8px 0; min-width: 180px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 20; display: none;">
+                <a href="/profile.html" class="dropdown-item" style="display: flex; align-items: center; gap: 10px; padding: 10px 16px; color: var(--text-muted); font-size: 13px; text-decoration: none;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                  Update account
+                </a>
+
+                <a href="#" class="dropdown-item" id="header-logout" style="display: flex; align-items: center; gap: 10px; padding: 10px 16px; color: var(--red); font-size: 13px; text-decoration: none;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                  Sign out
+                </a>
+              </div>
+            </div>
+          </div>
+        `;
+        
+        // Handlers
+        document.getElementById('header-user-menu-btn')?.addEventListener('click', (e) => {
+          if (e.target.closest('#header-user-dropdown')) return;
+          e.stopPropagation();
+          document.getElementById('header-user-dropdown').classList.toggle('show');
+          document.getElementById('header-notifications-dropdown')?.classList.remove('show');
+        });
+        document.getElementById('header-notifications-btn')?.addEventListener('click', (e) => {
+          if (e.target.closest('#header-notifications-dropdown')) return;
+          e.stopPropagation();
+          document.getElementById('header-notifications-dropdown').classList.toggle('show');
+          document.getElementById('header-user-dropdown')?.classList.remove('show');
+        });
+        document.addEventListener('click', () => {
+          document.getElementById('header-user-dropdown')?.classList.remove('show');
+          document.getElementById('header-notifications-dropdown')?.classList.remove('show');
+        });
+        document.getElementById('header-logout')?.addEventListener('click', async (e) => {
+          e.preventDefault();
+          await fetch('/api/auth/logout', { method: 'POST' });
+          window.location.href = '/';
+        });
+
+        renderForm();
+        loadPrior();
+      } catch (e) {
+        window.location.href = '/';
+      }
+    }
+
+    function renderForm() {
+      content.innerHTML = `
+        <h1 class="page-title">Run a What-If</h1>
+        <p class="page-sub">Submit a strategic scenario you'd want our AI to simulate. The editorial team shortlists one What-If per week and runs it as a full simulation cycle on the Principle engine.</p>
+        <div class="card">
+          <form id="wf-form">
+            <div class="form-row">
+              <label>Scenario title <span style="color:var(--red)">*</span></label>
+              <div class="hint">Frame as a question or hypothesis. Max 100 characters.</div>
+              <input type="text" name="title" maxlength="100" required placeholder="e.g. Will autonomous freight depress US trucking wages by 30% by 2030?">
+              <div class="counter" id="c-title">0 / 100</div>
+            </div>
+            <div class="form-row">
+              <label>Scenario description <span style="color:var(--red)">*</span></label>
+              <div class="hint">Explain in plain language. Max 500 characters.</div>
+              <textarea name="description" maxlength="500" required></textarea>
+              <div class="counter" id="c-description">0 / 500</div>
+            </div>
+            <div class="form-row">
+              <label>Why should a leader care? <span style="color:var(--red)">*</span></label>
+              <div class="hint">Strategic relevance to decision-makers. Max 300 characters.</div>
+              <textarea name="leaderRelevance" maxlength="300" required></textarea>
+              <div class="counter" id="c-leaderRelevance">0 / 300</div>
+            </div>
+            <div class="form-row">
+              <label>Simulation recommendation <span style="color:var(--text-muted);font-weight:400;">(optional)</span></label>
+              <div class="hint">Suggested simulation type or model.</div>
+              <input type="text" name="suggestedSimulation" placeholder="e.g. Monte Carlo on labor market substitution">
+            </div>
+            <div class="form-row">
+              <label>Supporting links / sources <span style="color:var(--text-muted);font-weight:400;">(optional)</span></label>
+              <div class="hint">One URL per line, or space-separated.</div>
+              <textarea name="supportingLinks" placeholder="https://..."></textarea>
+            </div>
+            <button type="submit" class="submit-btn">Submit for review</button>
+            <div class="err" id="wf-err"></div>
+          </form>
+        </div>
+        <div id="prior-mount" class="past-list"></div>
+      `;
+
+      // Counters
+      ['title','description','leaderRelevance'].forEach(name => {
+        const el = document.querySelector(`[name=${name}]`);
+        const counter = document.getElementById(`c-${name}`);
+        const max = +el.getAttribute('maxlength');
+        const update = () => {
+          const n = el.value.length;
+          counter.textContent = `${n} / ${max}`;
+          counter.classList.toggle('warn', n > max * 0.85 && n <= max);
+          counter.classList.toggle('over', n > max);
+        };
+        el.addEventListener('input', update);
+        update();
+      });
+
+      document.getElementById('wf-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fd = new FormData(e.target);
+        const linksRaw = (fd.get('supportingLinks') || '').toString().trim();
+        const body = {
+          title: fd.get('title'),
+          description: fd.get('description'),
+          leaderRelevance: fd.get('leaderRelevance'),
+          suggestedSimulation: fd.get('suggestedSimulation'),
+          supportingLinks: linksRaw ? linksRaw.split(/\s+/).filter(Boolean) : []
+        };
+        const errEl = document.getElementById('wf-err');
+        errEl.textContent = '';
+        const btn = e.target.querySelector('button[type=submit]');
+        btn.disabled = true; btn.textContent = 'Submitting…';
+        try {
+          const r = await fetch('/api/whatifs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+          });
+          const d = await r.json();
+          if (!r.ok) throw new Error(d.error || 'Submission failed');
+          renderThanks(d.submission);
+        } catch (err) {
+          errEl.textContent = err.message;
+        } finally {
+          btn.disabled = false; btn.textContent = 'Submit for review';
+        }
+      });
+    }
+
+    function renderThanks(submission) {
+      content.innerHTML = `
+        <div class="card">
+          <div class="thanks">
+            <div class="check">✓</div>
+            <h2>Thanks — we got your What-If</h2>
+            <p>Your submission is in the editorial queue. The team shortlists one scenario per week and you'll be notified by email if yours is picked up.</p>
+            <a href="/whatif.html" class="submit-btn" style="display:inline-block;text-decoration:none;">Submit another</a>
+            <a href="/" style="display:inline-block;margin-left:12px;color:var(--text-muted);font-size:14px;">← Back to feed</a>
+          </div>
+        </div>
+        <div id="prior-mount" class="past-list"></div>
+      `;
+      loadPrior(submission?._id);
+    }
+
+    async function loadPrior(highlightId) {
+      try {
+        const r = await fetch('/api/whatifs/mine');
+        if (!r.ok) return;
+        const { submissions } = await r.json();
+        const mount = document.getElementById('prior-mount');
+        if (!mount) return;
+        if (!submissions.length) {
+          mount.innerHTML = '';
+          return;
+        }
+        mount.innerHTML = `
+          <h3>Your submissions (${submissions.length})</h3>
+          ${submissions.map(s => `
+            <div class="past-item" ${s._id === highlightId ? 'style="border-left-color:var(--green);"' : ''}>
+              <div class="ph">
+                <div class="pt">${escapeHtml(s.title)}</div>
+                <span class="status-badge ${s.status}">${s.status}</span>
+              </div>
+              <div class="pdesc">${escapeHtml(s.description)}</div>
+              <div class="pd" style="margin-top:6px;">Submitted ${formatDate(s.createdAt)}</div>
+            </div>
+          `).join('')}
+        `;
+      } catch {}
+    }
+
+    function formatDate(d) {
+      const dt = new Date(d);
+      return dt.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+    function escapeHtml(s) {
+      return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+  </script>
+</body>
+</html>

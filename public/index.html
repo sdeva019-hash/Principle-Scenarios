@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Principle Scenarios</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #0a1628;
+      --bg-card: rgba(15, 23, 42, 0.8);
+      --border: rgba(96, 165, 250, 0.15);
+      --border-strong: rgba(96, 165, 250, 0.4);
+      --text: #e8edf5;
+      --text-muted: #94a3b8;
+      --accent: #3b82f6;
+      --accent-bright: #60a5fa;
+      --accent-deep: #2563eb;
+      --green: #22c55e;
+      --red: #ef4444;
+      --yellow: #fbbf24;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      background: radial-gradient(ellipse at top, #0e1f3a 0%, var(--bg) 60%);
+      background-attachment: fixed;
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+    a { color: var(--accent-bright); text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; }
+
+    /* ---------- Top nav ---------- */
+    header {
+      position: sticky; top: 0; z-index: 10;
+      background: rgba(10, 22, 40, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+    }
+    .nav-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    }
+    .brand {
+      font-weight: 700; font-size: 18px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .brand .dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--accent-bright);
+      box-shadow: 0 0 12px var(--accent-bright);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .nav-links { display: flex; gap: 8px; align-items: center; }
+    .nav-links a {
+      padding: 8px 14px; border-radius: 8px;
+      color: var(--text-muted); font-size: 14px; font-weight: 500;
+    }
+    .nav-links a:hover, .nav-links a.active { background: rgba(59, 130, 246, 0.15); color: var(--text); }
+    .me-chip { font-size: 13px; color: var(--text-muted); }
+    .me-chip strong { color: var(--text); font-weight: 600; }
+
+    /* ---------- Layout ---------- */
+    .app-layout { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 280px 1fr; gap: 32px; padding: 32px 24px; align-items: start; }
+    @media (max-width: 768px) { .app-layout { grid-template-columns: 1fr; } }
+    main.feed-content { padding: 0; min-width: 0; }
+
+    /* ---------- User Panel Sidebar ---------- */
+    .user-panel {
+      position: sticky; top: 90px;
+      background: var(--bg-card); backdrop-filter: blur(10px);
+      border: 1px solid var(--border); border-radius: 14px; padding: 20px;
+    }
+    .user-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+    .avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-deep)); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600; font-size: 16px; flex-shrink: 0;
+    }
+    .user-info { flex: 1; overflow: hidden; }
+    .user-name { font-size: 15px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-title { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    
+    .menu-container { position: relative; }
+    .kebab-btn { background: none; border: none; color: var(--text-muted); font-size: 20px; padding: 4px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .kebab-btn:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+    .dropdown-menu {
+      position: absolute; top: 100%; left: 0; margin-top: 8px;
+      background: rgba(15, 23, 42, 0.95); border: 1px solid var(--border-strong);
+      border-radius: 10px; padding: 8px 0; min-width: 240px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: none; z-index: 20;
+    }
+    .dropdown-menu.show { display: block; }
+    .dropdown-item {
+      display: block; padding: 10px 16px; color: var(--text-muted);
+      font-size: 13px; text-decoration: none; transition: all 0.15s;
+    }
+    .dropdown-item:hover { background: rgba(59, 130, 246, 0.15); color: var(--text); }
+
+    .sidebar-nav { display: flex; flex-direction: column; gap: 4px; border-top: 1px solid var(--border); padding-top: 16px; }
+    .sidebar-nav a {
+      display: block; padding: 10px 14px; border-radius: 8px;
+      color: var(--text-muted); font-size: 14px; font-weight: 500;
+      text-decoration: none; transition: background 0.15s;
+    }
+    .sidebar-nav a:hover, .sidebar-nav a.active {
+      background: rgba(59, 130, 246, 0.15); color: var(--text);
+    }
+
+    h1.feed-title { font-size: 28px; font-weight: 700; margin-bottom: 6px; }
+    .feed-sub { color: var(--text-muted); margin-bottom: 24px; font-size: 14px; }
+
+    /* ---------- Filter tabs ---------- */
+    .filter-bar {
+      display: flex; gap: 4px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+    .filter-tab {
+      background: none; border: none; color: var(--text-muted);
+      padding: 12px 18px; font-size: 14px; font-weight: 500;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .filter-tab:hover { color: var(--text); }
+    .filter-tab.active { color: var(--accent-bright); border-bottom-color: var(--accent-bright); }
+
+    /* ---------- Cards grid ---------- */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 20px;
+    }
+    .play-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      transition: transform 0.18s, border-color 0.18s, box-shadow 0.18s;
+      cursor: pointer;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .play-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--border-strong);
+      box-shadow: 0 12px 32px -12px rgba(59, 130, 246, 0.4);
+    }
+    .card-head { display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+    .card-head-left { display: flex; align-items: center; gap: 10px; }
+    .card-actions { display: flex; align-items: center; gap: 8px; }
+    .share-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: all 0.15s; }
+    .share-btn:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 4px 10px; border-radius: 999px;
+      background: rgba(34, 197, 94, 0.15); color: var(--green);
+    }
+    .badge.live::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green); box-shadow: 0 0 8px var(--green);
+      animation: pulse 1.6s infinite;
+    }
+    .badge.concluded { background: rgba(148, 163, 184, 0.15); color: var(--text-muted); }
+    .badge.upcoming { background: rgba(251, 191, 36, 0.15); color: var(--yellow); }
+    .card-title { font-size: 16px; font-weight: 600; line-height: 1.35; }
+    .card-desc { font-size: 13px; color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .card-chart { width: 100%; height: 80px; }
+    .card-foot { display: flex; align-items: center; justify-content: space-between; }
+    .meta { font-size: 12px; color: var(--text-muted); display: flex; gap: 14px; }
+    .meta strong { color: var(--text); font-weight: 600; }
+    .follow-btn {
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px solid var(--border-strong);
+      color: var(--accent-bright);
+      padding: 6px 14px; border-radius: 8px;
+      font-size: 13px; font-weight: 500;
+      transition: all 0.15s;
+    }
+    .follow-btn:hover { background: rgba(59, 130, 246, 0.25); }
+    .follow-btn.following { background: var(--accent-deep); color: white; border-color: var(--accent-deep); }
+
+    .empty { text-align: center; color: var(--text-muted); padding: 60px 20px; }
+
+    /* ---------- Sign-up form ---------- */
+    .auth-shell {
+      max-width: 520px; margin: 60px auto; padding: 0 24px;
+    }
+    .auth-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+    }
+    .auth-card h1 { font-size: 24px; margin-bottom: 6px; }
+    .auth-card p.lead { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
+    .form-row { margin-bottom: 14px; }
+    .form-row.two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    label { display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; }
+    input[type=text], input[type=email], select, textarea {
+      width: 100%; background: rgba(10, 22, 40, 0.6);
+      border: 1px solid var(--border);
+      color: var(--text); font-family: inherit; font-size: 14px;
+      padding: 10px 12px; border-radius: 8px;
+      transition: border-color 0.15s;
+    }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent-bright); }
+    .check-row { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+    .check-row input { margin-top: 3px; accent-color: var(--accent); }
+    .submit-btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+      border: none; color: white;
+      padding: 12px; border-radius: 10px;
+      font-size: 15px; font-weight: 600;
+      transition: transform 0.1s, box-shadow 0.15s;
+      margin-top: 8px;
+    }
+    .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px -6px rgba(59, 130, 246, 0.6); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+    .err { color: var(--red); font-size: 13px; margin-top: 10px; min-height: 18px; }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script>
+    // --- Country list (short pragmatic list; expand if needed) ---
+    const COUNTRIES = [
+      'United States','United Kingdom','Canada','Germany','France','Netherlands','Sweden','Switzerland',
+      'Singapore','Japan','Australia','Ireland','Spain','Italy','Belgium','Denmark','Norway','Finland',
+      'Poland','United Arab Emirates','India','Brazil','Mexico','South Korea','Other'
+    ];
+    const COMPANY_SIZES = ['1-499','500-1999','2000-9999','10000+'];
+
+    // --- Mini SVG sparkline ---
+    function renderSparkline(container, points, opts = {}) {
+      const w = opts.width || 320;
+      const h = opts.height || 80;
+      const pad = 4;
+      if (!points.length) return;
+      const xs = points.map((_, i) => pad + (i / (points.length - 1)) * (w - 2 * pad));
+      const ys = points.map(p => h - pad - p.value * (h - 2 * pad));
+      const path = xs.map((x, i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${ys[i].toFixed(1)}`).join(' ');
+      const last = { x: xs[xs.length - 1], y: ys[ys.length - 1] };
+      const areaPath = `${path} L${xs[xs.length - 1]},${h - pad} L${xs[0]},${h - pad} Z`;
+      container.innerHTML = `
+        <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="width:100%;height:100%;">
+          <defs>
+            <linearGradient id="g-${Math.random().toString(36).slice(2, 8)}" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.5"/>
+              <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path d="${areaPath}" fill="url(#g-${container.id || 'x'})" opacity="0.6"/>
+          <path d="${path}" fill="none" stroke="#60a5fa" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+          <circle cx="${last.x.toFixed(1)}" cy="${last.y.toFixed(1)}" r="3" fill="#60a5fa"/>
+        </svg>`;
+    }
+
+    function timeAgo(d) {
+      const ms = Date.now() - new Date(d).getTime();
+      const m = Math.floor(ms / 60000);
+      if (m < 1) return 'just now';
+      if (m < 60) return `${m}m ago`;
+      const h = Math.floor(m / 60);
+      if (h < 24) return `${h}h ago`;
+      return `${Math.floor(h / 24)}d ago`;
+    }
+
+    // --- App state ---
+    const state = { me: null, filter: 'recommended' };
+    const app = document.getElementById('app');
+
+    // --- Init ---
+    init();
+    async function init() {
+      try {
+        const res = await fetch('/api/me');
+        if (res.ok) {
+          state.me = (await res.json()).member;
+          renderApp();
+        } else {
+          renderSignup();
+        }
+      } catch (e) {
+        renderSignup();
+      }
+    }
+
+    // --- Sign-up screen ---
+    function renderSignup(prefill = {}) {
+      app.innerHTML = `
+        <div class="auth-shell">
+          <div style="text-align:center;margin-bottom:28px;">
+            <div class="brand" style="justify-content:center;font-size:20px;">
+              <span class="dot"></span> Principle Scenarios
+            </div>
+            <p class="lead" style="margin-top:8px;color:var(--text-muted);font-size:13px;">Live AI foresight simulations for senior decision-makers.</p>
+          </div>
+          <div class="auth-card">
+            <h1>Request access</h1>
+            <p class="lead">Principle Scenarios is gated for verified senior leaders at organisations with 500+ employees.</p>
+            <form id="signup-form">
+              <div class="form-row two">
+                <div><label>First name</label><input type="text" name="firstName" required value="${prefill.firstName || ''}"></div>
+                <div><label>Last name</label><input type="text" name="lastName" required value="${prefill.lastName || ''}"></div>
+              </div>
+              <div class="form-row"><label>Work email</label><input type="email" name="email" required value="${prefill.email || ''}"></div>
+              <div class="form-row"><label>Job title</label><input type="text" name="jobTitle" placeholder="e.g. VP of Strategy" required value="${prefill.jobTitle || ''}"></div>
+              <div class="form-row"><label>Company</label><input type="text" name="companyName" required value="${prefill.companyName || ''}"></div>
+              <div class="form-row two">
+                <div>
+                  <label>Company size</label>
+                  <select name="companySize" required>
+                    <option value="">Select…</option>
+                    ${COMPANY_SIZES.map(s => `<option value="${s}">${s} employees</option>`).join('')}
+                  </select>
+                </div>
+                <div>
+                  <label>Country</label>
+                  <select name="country" required>
+                    <option value="">Select…</option>
+                    ${COUNTRIES.map(c => `<option value="${c}">${c}</option>`).join('')}
+                  </select>
+                </div>
+              </div>
+              <div class="check-row">
+                <input type="checkbox" id="seniority" name="seniorityConfirmed" required>
+                <label for="seniority" style="margin:0;color:var(--text-muted);">I confirm I hold a Director, VP, C-suite, or equivalent decision-making leadership role.</label>
+              </div>
+              <div class="check-row">
+                <input type="checkbox" id="terms" name="termsAccepted" required>
+                <label for="terms" style="margin:0;color:var(--text-muted);">I accept the <a href="#">Terms &amp; Conditions</a> and <a href="#">Privacy Policy</a>.</label>
+              </div>
+              <button type="submit" class="submit-btn">Request access</button>
+              <div class="err" id="signup-err"></div>
+            </form>
+          </div>
+        </div>`;
+
+      document.getElementById('signup-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fd = new FormData(e.target);
+        const body = {
+          firstName: fd.get('firstName'),
+          lastName: fd.get('lastName'),
+          email: fd.get('email'),
+          jobTitle: fd.get('jobTitle'),
+          companyName: fd.get('companyName'),
+          companySize: fd.get('companySize'),
+          country: fd.get('country'),
+          seniorityConfirmed: fd.get('seniorityConfirmed') === 'on',
+          termsAccepted: fd.get('termsAccepted') === 'on'
+        };
+        const errEl = document.getElementById('signup-err');
+        errEl.textContent = '';
+        const btn = e.target.querySelector('button[type=submit]');
+        btn.disabled = true; btn.textContent = 'Submitting…';
+        try {
+          const res = await fetch('/api/auth/signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Signup failed');
+          state.me = data.member;
+          renderApp();
+        } catch (err) {
+          errEl.textContent = err.message;
+        } finally {
+          btn.disabled = false; btn.textContent = 'Request access';
+        }
+      });
+    }
+
+    // --- Main app shell ---
+    function renderApp() {
+      app.innerHTML = `
+        <header>
+          <div class="nav-inner">
+            <a href="/" class="brand" style="text-decoration: none; color: inherit;"><span class="dot"></span> Principle Scenarios</a>
+            <div id="header-profile-container" style="display: flex; align-items: center; gap: 16px;">
+              <div class="header-notifications" id="header-notifications-btn" style="position: relative; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; transition: background 0.15s;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                <span style="position: absolute; top: 2px; right: 4px; width: 8px; height: 8px; background: var(--red); border-radius: 50%; border: 2px solid var(--bg-card);"></span>
+                <div class="dropdown-menu" id="header-notifications-dropdown" style="position: absolute; top: 100%; right: -10px; margin-top: 12px; background: rgba(15, 23, 42, 0.95); border: 1px solid var(--border-strong); border-radius: 12px; padding: 12px; width: 300px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 20; cursor: default;">
+                  <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); color: var(--text);">Notifications</h3>
+                  <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="display: flex; gap: 12px; align-items: flex-start;">
+                      <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0;">AS</div>
+                      <div style="line-height: 1.4;">
+                        <p style="font-size: 13px; color: var(--text); margin-bottom: 4px;"><strong>Alex Sterling</strong> replied to your comment on <em>AI Governance</em>.</p>
+                        <span style="font-size: 11px; color: var(--text-muted);">2 hours ago</span>
+                      </div>
+                    </div>
+                    <div style="display: flex; gap: 12px; align-items: flex-start;">
+                      <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
+                      <div style="line-height: 1.4;">
+                        <p style="font-size: 13px; color: var(--text); margin-bottom: 4px;">Your WhatIf submission <em>'AI Resource Scarcity'</em> is under review.</p>
+                        <span style="font-size: 11px; color: var(--text-muted);">Yesterday</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="header-profile" id="header-user-menu-btn" style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px 8px; border-radius: 8px; transition: background 0.15s;">
+                <div class="avatar" id="header-avatar-display" style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent-deep)); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px;">${escapeHtml((state.me.firstName || 'U')[0])}${escapeHtml((state.me.lastName || '')[0] || '')}</div>
+                <div class="menu-container" style="position: relative;">
+                  <button class="kebab-btn" style="background: none; border: none; color: var(--text-muted); font-size: 20px; padding: 4px; cursor: pointer; display: flex; align-items: center; pointer-events: none;">&#8942;</button>
+                  <div class="dropdown-menu" id="header-user-dropdown" style="position: absolute; top: 100%; right: 0; margin-top: 8px; background: rgba(15, 23, 42, 0.95); border: 1px solid var(--border-strong); border-radius: 10px; padding: 8px 0; min-width: 180px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 20;">
+                    <a href="/profile.html" class="dropdown-item" style="display: flex; align-items: center; gap: 10px; padding: 10px 16px; color: var(--text-muted); font-size: 13px; text-decoration: none;">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                      Update account
+                    </a>
+
+                    <a href="#" class="dropdown-item" id="header-logout" style="display: flex; align-items: center; gap: 10px; padding: 10px 16px; color: var(--red); font-size: 13px; text-decoration: none;">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                      Sign out
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+        <div class="app-layout">
+          <aside class="user-panel">
+            <div class="user-profile">
+              <div class="avatar">${escapeHtml((state.me.firstName || 'U')[0])}${escapeHtml((state.me.lastName || '')[0] || '')}</div>
+              <div class="user-info">
+                <div class="user-name">${escapeHtml(state.me.firstName)} ${escapeHtml(state.me.lastName)}</div>
+                <div class="user-title">${escapeHtml(state.me.jobTitle)} at ${escapeHtml(state.me.companyName)}</div>
+              </div>
+            </div>
+            <div class="sidebar-nav">
+              <a href="/" class="active">Feed</a>
+              <a href="/events.html">Events</a>
+              <a href="/settings.html">Settings</a>
+            </div>
+          </aside>
+          <main class="feed-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <h1 class="feed-title" style="margin-bottom: 0;">Live simulations</h1>
+              <a href="/whatif.html" style="background: var(--accent-deep); color: white; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 14px;">Run a What-If</a>
+            </div>
+            <p class="feed-sub">Each card is a live AI foresight simulation. Follow to track in real time.</p>
+            <div class="filter-bar">
+              <button class="filter-tab ${state.filter === 'recommended' ? 'active' : ''}" data-f="recommended">Recommended</button>
+              <button class="filter-tab ${state.filter === 'following' ? 'active' : ''}" data-f="following">Following</button>
+              <button class="filter-tab ${state.filter === 'latest' ? 'active' : ''}" data-f="latest">Latest</button>
+            </div>
+            <div id="feed-grid" class="grid"><div class="empty">Loading…</div></div>
+          </main>
+        </div>`;
+
+      document.getElementById('header-user-menu-btn')?.addEventListener('click', (e) => {
+        if (e.target.closest('#header-user-dropdown')) return;
+        e.stopPropagation();
+        document.getElementById('header-user-dropdown').classList.toggle('show');
+        document.getElementById('header-notifications-dropdown')?.classList.remove('show');
+      });
+      document.getElementById('header-notifications-btn')?.addEventListener('click', (e) => {
+        if (e.target.closest('#header-notifications-dropdown')) return;
+        e.stopPropagation();
+        document.getElementById('header-notifications-dropdown').classList.toggle('show');
+        document.getElementById('header-user-dropdown')?.classList.remove('show');
+      });
+      document.addEventListener('click', () => {
+        document.getElementById('header-user-dropdown')?.classList.remove('show');
+        document.getElementById('header-notifications-dropdown')?.classList.remove('show');
+      });
+      document.getElementById('header-logout')?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        await fetch('/api/auth/logout', { method: 'POST' });
+        state.me = null;
+        renderSignup();
+      });
+
+      document.querySelectorAll('.filter-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.filter = btn.dataset.f;
+          document.querySelectorAll('.filter-tab').forEach(b => b.classList.toggle('active', b === btn));
+          loadFeed();
+        });
+      });
+
+
+      loadFeed();
+    }
+
+    async function loadFeed() {
+      const grid = document.getElementById('feed-grid');
+      grid.innerHTML = '<div class="empty">Loading…</div>';
+      try {
+        const res = await fetch(`/api/simulations?filter=${state.filter}`);
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          grid.innerHTML = `<div class="empty">${escapeHtml(data.error || 'Could not load simulations')}</div>`;
+          return;
+        }
+        const { simulations } = await res.json();
+        if (!simulations.length) {
+          grid.innerHTML = `<div class="empty">${state.filter === 'following' ? 'You are not following any simulations yet.' : 'No simulations yet.'}</div>`;
+          return;
+        }
+        grid.innerHTML = simulations.map(renderCard).join('');
+        simulations.forEach(s => {
+          const el = document.getElementById(`chart-${s.id}`);
+          if (el) renderSparkline(el, s.trajectory);
+        });
+        // Bind interactions
+        grid.querySelectorAll('[data-card-id]').forEach(card => {
+          card.addEventListener('click', () => { window.location.href = `/simulation.html?id=${card.dataset.cardId}`; });
+        });
+        grid.querySelectorAll('.share-btn').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const url = btn.dataset.shareUrl;
+            const title = btn.dataset.shareTitle;
+            if (navigator.share) {
+              try { await navigator.share({ title, url }); } catch (err) {}
+            } else {
+              navigator.clipboard.writeText(url);
+              alert('Link copied to clipboard!');
+            }
+          });
+        });
+        grid.querySelectorAll('[data-follow-id]').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const id = btn.dataset.followId;
+            const wasFollowing = btn.classList.contains('following');
+            btn.classList.toggle('following');
+            btn.textContent = wasFollowing ? 'Follow' : 'Following';
+            try {
+              const r = await fetch(`/api/simulations/${id}/follow`, { method: 'POST' });
+              const d = await r.json();
+              if (!r.ok) throw new Error(d.error);
+              btn.classList.toggle('following', d.isFollowing);
+              btn.textContent = d.isFollowing ? 'Following' : 'Follow';
+              const countEl = document.getElementById(`fc-${id}`);
+              if (countEl) countEl.textContent = d.followerCount;
+            } catch (err) {
+              btn.classList.toggle('following');
+              alert(err.message);
+            }
+          });
+        });
+      } catch (err) {
+        grid.innerHTML = `<div class="empty">${escapeHtml(err.message)}</div>`;
+      }
+    }
+
+    function renderCard(s) {
+      const status = (s.status || 'live').toLowerCase();
+      return `
+        <article class="play-card" data-card-id="${s.id}">
+          <div class="card-head">
+            <div class="card-head-left">
+              <span class="badge ${status}">${status === 'live' ? 'Live' : status[0].toUpperCase() + status.slice(1)}</span>
+            </div>
+            <div class="card-actions">
+              <button class="share-btn" data-share-url="${window.location.origin}/simulation.html?id=${s.id}" data-share-title="${escapeHtml(s.title)}" title="Share">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+              </button>
+              <button class="follow-btn ${s.isFollowing ? 'following' : ''}" data-follow-id="${s.id}">
+                ${s.isFollowing ? 'Following' : 'Follow'}
+              </button>
+            </div>
+          </div>
+          <h2 class="card-title">${escapeHtml(s.title)}</h2>
+          <p class="card-desc">${escapeHtml(s.description)}</p>
+          <div id="chart-${s.id}" class="card-chart"></div>
+          <div class="card-foot">
+            <div class="meta">
+              <span><strong id="fc-${s.id}">${s.followerCount}</strong> following</span>
+              <span><strong>${Math.round((s.latest?.value || 0) * 100)}%</strong> trajectory</span>
+            </div>
+            <div class="meta"><span>${timeAgo(s.updatedAt)}</span></div>
+          </div>
+        </article>`;
+    }
+
+    function escapeHtml(s) {
+      return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+  </script>
+</body>
+</html>

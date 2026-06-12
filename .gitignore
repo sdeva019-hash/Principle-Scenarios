@@ -1,0 +1,14 @@
+node_modules/
+simulations/
+*.log
+*.err
+%TEMP%*
+C:Users*
+gemini35_check.json
+sims_check.json
+entity_vitals_*.txt
+worldcard_block.txt
+.env
+.claude/
+principle-scenarios/
+*tmp_sim.json

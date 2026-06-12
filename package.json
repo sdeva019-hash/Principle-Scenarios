@@ -1,0 +1,36 @@
+{
+  "name": "principle-scenarios",
+  "version": "0.1.0",
+  "description": "Principle Scenarios - Community platform for the Principle AI Simulation Engine",
+  "type": "module",
+  "main": "src/app.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node src/app.js",
+    "seed": "node scripts/seed.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpenBabylon/principle-scenarios.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/OpenBabylon/principle-scenarios/issues"
+  },
+  "homepage": "https://github.com/OpenBabylon/principle-scenarios#readme",
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongoose": "^9.4.1"
+  },
+  "devDependencies": {
+    "xlsx": "^0.18.5"
+  }
+}

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Principle Scenarios</title>
+  <link rel="stylesheet" href="/index.css">
+  <style>
+    .layout-admin {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: 100vh;
+    }
+    .admin-sidebar {
+      background: var(--bg-card);
+      border-right: 1px solid var(--border);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .admin-sidebar h1 {
+      font-size: 18px;
+      margin-bottom: 24px;
+      padding-left: 12px;
+      color: var(--text);
+    }
+    .admin-tab {
+      padding: 12px 16px;
+      border-radius: 8px;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .admin-tab:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+    }
+    .admin-tab.active {
+      background: rgba(96, 165, 250, 0.1);
+      color: var(--accent-bright);
+    }
+    .admin-main {
+      padding: 32px 48px;
+      background: var(--bg-body);
+      overflow-y: auto;
+    }
+    .section-header {
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .admin-section {
+      display: none;
+    }
+    .admin-section.active {
+      display: block;
+    }
+    
+    /* Tables */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .data-table th, .data-table td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .data-table th {
+      background: rgba(255,255,255,0.02);
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    .data-table tr:hover {
+      background: rgba(255,255,255,0.02);
+    }
+    
+    /* Action Buttons */
+    .action-btn {
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      font-size: 12px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .action-btn:hover {
+      background: rgba(255,255,255,0.05);
+    }
+    .action-btn.danger:hover {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border-color: #ef4444;
+    }
+    .action-btn.success:hover {
+      background: rgba(34, 197, 94, 0.1);
+      color: #22c55e;
+      border-color: #22c55e;
+    }
+
+    .badge-status {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(255,255,255,0.1);
+    }
+    .badge-status.verified { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+    .badge-status.blocked { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+    .badge-status.hidden { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+  </style>
+</head>
+<body>
+  <div class="layout-admin">
+    <nav class="admin-sidebar">
+      <h1>Admin Dashboard</h1>
+      <div class="admin-tab active" data-tab="profiles">Profiles</div>
+      <div class="admin-tab" data-tab="comments">Comments</div>
+      <div class="admin-tab" data-tab="whatifs">What-If Scenarios</div>
+      <div class="admin-tab" data-tab="simulations">Simulations Engine</div>
+      <div style="flex:1"></div>
+      <a href="/" class="admin-tab" style="text-decoration:none;">← Back to App</a>
+    </nav>
+    <main class="admin-main">
+      
+      <!-- PROFILES SECTION -->
+      <section id="profiles" class="admin-section active">
+        <div class="section-header">
+          <h2>User Profiles</h2>
+          <p style="color:var(--text-muted); font-size:14px; margin-top:8px;">Manage member accounts, verify leadership roles, and block disruptive users.</p>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Company</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="profiles-tbody">
+            <tr><td colspan="5" style="text-align:center;">Loading...</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- COMMENTS SECTION -->
+      <section id="comments" class="admin-section">
+        <div class="section-header">
+          <h2>Comment Moderation</h2>
+          <p style="color:var(--text-muted); font-size:14px; margin-top:8px;">Review platform comments and hide inappropriate content.</p>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Author</th>
+              <th>Comment</th>
+              <th>Simulation ID</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="comments-tbody">
+            <tr><td colspan="5" style="text-align:center;">Loading...</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- WHAT-IFS SECTION -->
+      <section id="whatifs" class="admin-section">
+        <div class="section-header">
+          <h2>What-If Scenarios</h2>
+          <p style="color:var(--text-muted); font-size:14px; margin-top:8px;">Review community-submitted scenario ideas.</p>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Submitter</th>
+              <th>Title / Description</th>
+              <th>Leader Relevance</th>
+            </tr>
+          </thead>
+          <tbody id="whatifs-tbody">
+            <tr><td colspan="3" style="text-align:center;">Loading...</td></tr>
+          </tbody>
+        </table>
+      </section>
+      
+      <!-- SIMULATIONS SECTION -->
+      <section id="simulations" class="admin-section">
+        <div class="section-header">
+          <h2>Simulations Engine</h2>
+          <p style="color:var(--text-muted); font-size:14px; margin-top:8px;">Manage AI-driven simulations and force engine update cycles.</p>
+        </div>
+        
+        <div style="background:var(--bg-card); border:1px solid var(--border); padding:20px; border-radius:12px; margin-bottom:24px;">
+          <h3 style="margin-bottom: 12px; font-size: 15px;">Create New Simulation</h3>
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <input type="text" id="sim-id" placeholder="Simulation ID (e.g. eu-ai-act)" style="padding:8px 12px; background:rgba(255,255,255,0.05); border:1px solid var(--border); color:var(--text); border-radius:6px; flex:1;">
+            <input type="text" id="sim-title" placeholder="Title" style="padding:8px 12px; background:rgba(255,255,255,0.05); border:1px solid var(--border); color:var(--text); border-radius:6px; flex:2;">
+            <input type="text" id="sim-desc" placeholder="Description" style="padding:8px 12px; background:rgba(255,255,255,0.05); border:1px solid var(--border); color:var(--text); border-radius:6px; flex:3;">
+            <button class="action-btn success" onclick="createSimulation()">Create</button>
+          </div>
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Title</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="simulations-tbody">
+            <tr><td colspan="4" style="text-align:center;">Loading...</td></tr>
+          </tbody>
+        </table>
+      </section>
+      
+    </main>
+  </div>
+
+  <script>
+    // Tab Switching Logic
+    const tabs = document.querySelectorAll('.admin-tab[data-tab]');
+    const sections = document.querySelectorAll('.admin-section');
+    
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        sections.forEach(s => s.classList.remove('active'));
+        
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.tab).classList.add('active');
+        
+        // Load data on tab click
+        if (tab.dataset.tab === 'profiles') loadProfiles();
+        if (tab.dataset.tab === 'comments') loadComments();
+        if (tab.dataset.tab === 'whatifs') loadWhatIfs();
+        if (tab.dataset.tab === 'simulations') loadSimulations();
+      });
+    });
+
+    function escapeHtml(s) {
+      return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    // --- API Calls ---
+
+    async function loadProfiles() {
+      try {
+        const r = await fetch('/api/admin/members');
+        if (!r.ok) throw new Error('Unauthorized');
+        const data = await r.json();
+        const tbody = document.getElementById('profiles-tbody');
+        
+        tbody.innerHTML = data.members.map(m => `
+          <tr>
+            <td>
+              <strong>${escapeHtml(m.firstName)} ${escapeHtml(m.lastName)}</strong><br>
+              <span style="color:var(--text-muted); font-size:12px;">${escapeHtml(m.jobTitle)}</span>
+            </td>
+            <td>${escapeHtml(m.email)}</td>
+            <td>${escapeHtml(m.companyName)} <br><span style="color:var(--text-muted); font-size:12px;">(${m.companySize})</span></td>
+            <td>
+              ${m.isVerified ? '<span class="badge-status verified">Verified</span>' : ''}
+              ${m.isBlocked ? '<span class="badge-status blocked">Blocked</span>' : ''}
+            </td>
+            <td>
+              <button class="action-btn success" onclick="toggleVerify('${m._id}')">${m.isVerified ? 'Unverify' : 'Verify'}</button>
+              <button class="action-btn danger" onclick="toggleBlock('${m._id}')">${m.isBlocked ? 'Unblock' : 'Block'}</button>
+            </td>
+          </tr>
+        `).join('') || '<tr><td colspan="5">No profiles found.</td></tr>';
+      } catch (err) {
+        document.getElementById('profiles-tbody').innerHTML = `<tr><td colspan="5" style="color:#ef4444;">Error: ${err.message}. Are you an admin?</td></tr>`;
+      }
+    }
+
+    async function toggleVerify(id) {
+      if (!confirm('Toggle verification status?')) return;
+      await fetch(`/api/admin/members/${id}/toggle-verify`, { method: 'POST' });
+      loadProfiles();
+    }
+
+    async function toggleBlock(id) {
+      if (!confirm('Toggle block status?')) return;
+      await fetch(`/api/admin/members/${id}/toggle-block`, { method: 'POST' });
+      loadProfiles();
+    }
+
+    async function loadComments() {
+      try {
+        const r = await fetch('/api/admin/comments');
+        if (!r.ok) throw new Error('Unauthorized');
+        const data = await r.json();
+        const tbody = document.getElementById('comments-tbody');
+        
+        tbody.innerHTML = data.comments.map(c => `
+          <tr>
+            <td>
+              <strong>${escapeHtml(c.authorId?.firstName)} ${escapeHtml(c.authorId?.lastName)}</strong><br>
+              <span style="color:var(--text-muted); font-size:12px;">${escapeHtml(c.authorId?.email)}</span>
+            </td>
+            <td><div style="max-width: 300px; white-space: pre-wrap;">${escapeHtml(c.text)}</div></td>
+            <td>${escapeHtml(c.simulationId)}</td>
+            <td>
+              ${c.isHidden ? '<span class="badge-status hidden">Hidden</span>' : '<span class="badge-status">Visible</span>'}
+            </td>
+            <td>
+              <button class="action-btn danger" onclick="toggleHideComment('${c._id}')">${c.isHidden ? 'Unhide' : 'Hide'}</button>
+            </td>
+          </tr>
+        `).join('') || '<tr><td colspan="5">No comments found.</td></tr>';
+      } catch (err) {
+        document.getElementById('comments-tbody').innerHTML = `<tr><td colspan="5" style="color:#ef4444;">Error: ${err.message}</td></tr>`;
+      }
+    }
+
+    async function toggleHideComment(id) {
+      if (!confirm('Toggle comment visibility?')) return;
+      await fetch(`/api/admin/comments/${id}/toggle-hide`, { method: 'POST' });
+      loadComments();
+    }
+
+    async function loadWhatIfs() {
+      try {
+        const r = await fetch('/api/admin/whatifs');
+        if (!r.ok) throw new Error('Unauthorized');
+        const data = await r.json();
+        const tbody = document.getElementById('whatifs-tbody');
+        
+        tbody.innerHTML = data.submissions.map(w => `
+          <tr>
+            <td>
+              <strong>${escapeHtml(w.submitterId?.firstName)} ${escapeHtml(w.submitterId?.lastName)}</strong><br>
+              <span style="color:var(--text-muted); font-size:12px;">${escapeHtml(w.submitterId?.email)}</span>
+            </td>
+            <td>
+              <strong>${escapeHtml(w.title)}</strong><br>
+              <div style="font-size:13px; color:var(--text-muted); max-width:400px; margin-top:4px;">${escapeHtml(w.description)}</div>
+            </td>
+            <td><div style="max-width:300px; font-size:13px;">${escapeHtml(w.leaderRelevance)}</div></td>
+          </tr>
+        `).join('') || '<tr><td colspan="3">No what-ifs found.</td></tr>';
+      } catch (err) {
+        document.getElementById('whatifs-tbody').innerHTML = `<tr><td colspan="3" style="color:#ef4444;">Error: ${err.message}</td></tr>`;
+      }
+    }
+
+    async function loadSimulations() {
+      try {
+        const r = await fetch('/api/simulations');
+        if (!r.ok) throw new Error('Failed to load');
+        const data = await r.json();
+        const tbody = document.getElementById('simulations-tbody');
+        
+        tbody.innerHTML = data.simulations.map(s => `
+          <tr>
+            <td>${escapeHtml(s.id)}</td>
+            <td><strong>${escapeHtml(s.title)}</strong></td>
+            <td><span class="badge-status ${s.status === 'live' ? 'verified' : 'hidden'}">${s.status}</span></td>
+            <td>
+              <button class="action-btn" style="border-color:var(--accent); color:var(--accent-bright);" onclick="triggerCycle('${s.id}')">Trigger Cycle</button>
+            </td>
+          </tr>
+        `).join('') || '<tr><td colspan="4">No simulations found.</td></tr>';
+      } catch (err) {
+        document.getElementById('simulations-tbody').innerHTML = `<tr><td colspan="4" style="color:#ef4444;">Error: ${err.message}</td></tr>`;
+      }
+    }
+
+    async function triggerCycle(id) {
+      if (!confirm('Force the AI engine to generate the next event for this simulation?')) return;
+      try {
+        const r = await fetch(`/api/admin/simulations/${id}/run-cycle`, { method: 'POST' });
+        const res = await r.json();
+        if (!r.ok) throw new Error(res.error || 'Failed');
+        alert('Cycle completed successfully. New event: ' + (res.result?.event?.title || 'Unknown'));
+        loadSimulations();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function createSimulation() {
+      const simulationId = document.getElementById('sim-id').value.trim();
+      const title = document.getElementById('sim-title').value.trim();
+      const description = document.getElementById('sim-desc').value.trim();
+      if (!simulationId || !title || !description) return alert('Fill all fields');
+      
+      try {
+        const r = await fetch('/api/admin/simulations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ simulationId, title, description })
+        });
+        const res = await r.json();
+        if (!r.ok) throw new Error(res.error || 'Failed');
+        document.getElementById('sim-id').value = '';
+        document.getElementById('sim-title').value = '';
+        document.getElementById('sim-desc').value = '';
+        loadSimulations();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    // Auth check on load
+    fetch('/api/me').then(r => r.json()).then(data => {
+      if (data.error || data.member?.role !== 'admin') {
+        alert('You must be an admin to view this page.');
+        window.location.href = '/';
+      } else {
+        // Load initial tab
+        loadProfiles();
+      }
+    });
+
+  </script>
+</body>
+</html>
