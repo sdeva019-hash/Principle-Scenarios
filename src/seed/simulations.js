@@ -866,11 +866,14 @@ function trajectory(values) {
 
 const sims = [
   underseaCableSabotage,
+  bsCableAttacks,
+  bsDeepfakeCrisis,
+];
+
+const _unused = [
   gemini35,
   gpt54mini,
   hybridGemini,
-  bsCableAttacks,
-  bsDeepfakeCrisis,
   grok43,
   {
     simulationId: 'eu-ai-act-reshoring',
