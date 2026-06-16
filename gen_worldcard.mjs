@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 
-const base = 'C:/Users/sdeva/principle-scenarios/simulations/grok_final_simulations/bs_cable_attacks/world_card';
+const simName = process.argv[2] || 'bs_cable_attacks';
+const base = `C:/Users/sdeva/principle-scenarios/simulations/grok_final_simulations/${simName}/world_card`;
 
 const fields = [
   'Ai Capability','Ai Investment','Hyperscaler Capex','Enterprise Ai Revenue',
@@ -61,5 +62,6 @@ ${out}
     ]
   },`;
 
-fs.writeFileSync('C:/Users/sdeva/worldcard_block.txt', block);
-console.log('Written', block.length, 'chars');
+const outPath = `C:/Users/sdeva/worldcard_${simName}.txt`;
+fs.writeFileSync(outPath, block);
+console.log('Written', block.length, 'chars →', outPath);
