@@ -30,19 +30,16 @@ const WorldCardTickSchema = new mongoose.Schema({
 }, { _id: false });
 
 const EntityVitalsTickSchema = new mongoose.Schema({
-  tick:           { type: Number, required: true },
-  market_power:   { type: Number, default: null },
-  technical_edge: { type: Number, default: null },
-  pressure:       { type: Number, default: null },
-  volatility:     { type: Number, default: null },
-  momentum:       { type: Number, default: null },
+  tick:  { type: Number, required: true },
+  state: { type: mongoose.Schema.Types.Mixed, default: {} },
 }, { _id: false });
 
 const EntityVitalsSchema = new mongoose.Schema({
-  agentId: { type: String, required: true },
-  name:    { type: String, required: true },
-  isMeta:  { type: Boolean, default: false },
-  ticks:   [EntityVitalsTickSchema],
+  agentId:  { type: String, required: true },
+  name:     { type: String, required: true },
+  category: { type: String, default: 'unknown' },
+  isMeta:   { type: Boolean, default: false },
+  ticks:    [EntityVitalsTickSchema],
 }, { _id: false });
 
 const SimulationSchema = new mongoose.Schema({

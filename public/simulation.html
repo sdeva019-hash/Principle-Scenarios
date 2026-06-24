@@ -231,9 +231,10 @@
       background: rgba(15,23,42,0.7); border: 1px solid var(--border);
       border-radius: 12px; padding: 14px 16px;
       transition: border-color 0.2s, background 0.2s;
-      position: relative; overflow: hidden;
+      position: relative; overflow: hidden; cursor: pointer;
     }
     .ev-card:hover { border-color: var(--border-strong); background: rgba(20,30,55,0.8); }
+    .ev-card.active { border-color: var(--accent-bright); background: rgba(20,30,55,0.9); }
     .ev-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
     .ev-card-name { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.3; }
     .ev-badge {
@@ -259,6 +260,24 @@
     .ev-bar-fill.high   { background: var(--green); }
     .ev-bar-fill.medium { background: var(--accent-bright); }
     .ev-bar-fill.low    { background: var(--red); }
+    /* Detail panel */
+    .ev-detail { margin-top: 20px; background: rgba(10,18,35,0.85); border: 1px solid var(--border-strong); border-radius: 14px; padding: 20px 24px; }
+    .ev-detail-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .ev-detail-name { font-size: 17px; font-weight: 700; }
+    .ev-detail-cat { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; }
+    .ev-fields-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+    .ev-field-item { background: rgba(15,23,42,0.6); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+    .ev-field-key { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .ev-field-val { font-size: 15px; font-weight: 600; color: var(--text); }
+    .ev-field-val.score-high { color: var(--green); }
+    .ev-field-val.score-mid  { color: var(--accent-bright); }
+    .ev-field-val.score-low  { color: var(--red); }
+    .ev-field-bar { width: 100%; height: 3px; background: rgba(96,165,250,0.12); border-radius: 2px; margin-top: 6px; }
+    .ev-field-bar-fill { height: 3px; border-radius: 2px; }
+    .ev-enum-pill { display: inline-block; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 12px; background: rgba(96,165,250,0.12); color: var(--accent-bright); border: 1px solid rgba(96,165,250,0.2); }
+    .ev-enum-pill.positive { background: rgba(52,211,153,0.12); color: var(--green); border-color: rgba(52,211,153,0.25); }
+    .ev-enum-pill.negative { background: rgba(251,113,133,0.12); color: var(--red); border-color: rgba(251,113,133,0.25); }
+    .ev-enum-pill.warning  { background: rgba(251,191,36,0.12); color: var(--yellow); border-color: rgba(251,191,36,0.25); }
   </style>
 </head>
 <body>
@@ -947,13 +966,70 @@
       renderEvGrid();
     }
 
+    const CATEGORY_LABELS = {
+      foundation_models: 'Foundation Model', cloud_hyperscalers: 'Cloud Hyperscaler',
+      chipmakers: 'Chipmaker', compute_infra: 'Compute Infra',
+      data_infra: 'Data Infra', enterprise_ai_platforms: 'Enterprise AI',
+      ai_native_apps: 'AI App', ai_distribution_tooling: 'Tooling',
+    };
+
+    // Fields that are 0–100 scores
+    const SCORE_FIELDS = new Set(['market_power','technical_edge','momentum','pressure','volatility',
+      'frontier_model_score','talent','public_sentiment_score','regulatory_exposure_score',
+      'performance_per_dollar','china_revenue_exposure_pct','gpu_utilization','customer_concentration_top_3',
+      'ai_cloud_revenue_share','cloud_operating_margin_pct','net_revenue_retention_pct',
+      'consumption_revenue_share','ai_workload_revenue_share_pct','ai_attach_rate_pct',
+      'gross_margin_pct','ai_revenue_share','clean_energy_share_pct','us_electricity_demand_growth_pct',
+      'data_center_capacity_growth_pct']);
+
+    // Enum fields and their sentiment direction
+    const ENUM_POSITIVE = new Set(['aggressive_expansion','cautious_growth','healthy','compounding',
+      'cash_positive','recently_raised','dominant_30plus','dominant_gt30','dominant_70plus',
+      'unlimited_internal','secured_partnership','secured_advanced_node','leader',
+      'low','gt4x','ratio_2_4x','mass_gt100k','scale_10k_100k','light_lt25','typical_25_40']);
+    const ENUM_NEGATIVE = new Set(['cost_cutting','underwater','shell','grinding','bridge_round',
+      'constrained','dependent','lagging','undersupplied','emerging_sub1','emerging_lt1',
+      'high','unsustainable_gt60','early_lt1k','lt1x']);
+
+    function evEnumClass(val) {
+      if (ENUM_POSITIVE.has(val)) return 'positive';
+      if (ENUM_NEGATIVE.has(val)) return 'negative';
+      return 'warning';
+    }
+
+    function evFormatKey(k) {
+      return k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    function evFormatVal(k, v) {
+      if (v === null || v === undefined) return '—';
+      if (typeof v === 'string') return v.replace(/_/g, ' ');
+      if (k.includes('usd_billions') || k === 'valuation' || k === 'valuation_usd_billions')
+        return `$${v >= 1000 ? (v/1000).toFixed(1) + 'T' : v.toFixed(1) + 'B'}`;
+      if (k.includes('usd_millions') || k === 'ai_revenue_usd_millions')
+        return `$${v >= 1000 ? (v/1000).toFixed(1) + 'B' : v.toFixed(0) + 'M'}`;
+      if (k === 'cloud_revenue_usd_billions')
+        return `$${v.toFixed(1)}B`;
+      if (k === 'ai_capex_usd_billions')
+        return `$${v.toFixed(1)}B`;
+      if (k === 'gpu_fleet') return `${v}k H100-eq`;
+      if (k.includes('_mw')) return `${v.toLocaleString()} MW`;
+      if (k.includes('_gw') || k.startsWith('gw_')) return `${v.toFixed(1)} GW`;
+      if (k.includes('_pct') || k.includes('_share') || SCORE_FIELDS.has(k)) return `${typeof v === 'number' ? Math.round(v) : v}`;
+      if (k === 'total_customers' || k === 'total_enterprise_customers') return v.toLocaleString();
+      if (typeof v === 'number') return Number.isInteger(v) ? v : v.toFixed(1);
+      return String(v);
+    }
+
+    let evSelectedEntity = null;
+
     function evGetVital(entity, fieldKey) {
-      // fieldKey: "__agent_market_power" etc → extract field name
-      const isMeta = entity.isMeta;
       let field = fieldKey.replace(/^__(agent|meta|all)_/, '');
-      // For __all_momentum just use momentum regardless of type
       if (fieldKey === '__all_momentum') field = 'momentum';
-      return entity.ticks.map(t => t[field] ?? null);
+      return entity.ticks.map(t => {
+        const v = t.state ? t.state[field] : null;
+        return (typeof v === 'number') ? v : null;
+      });
     }
 
     function evScoreClass(v) {
@@ -982,6 +1058,48 @@
       </svg>`;
     }
 
+    function renderEvDetailPanel(entity) {
+      if (!entity) return '';
+      const lastTick = entity.ticks[entity.ticks.length - 1];
+      const state = lastTick?.state || {};
+      const catLabel = entity.isMeta ? 'Market Factor' : (CATEGORY_LABELS[entity.category] || entity.category || 'Entity');
+
+      const fields = Object.entries(state).map(([k, v]) => {
+        const isScore = SCORE_FIELDS.has(k) && typeof v === 'number';
+        const isEnum = typeof v === 'string';
+        const displayVal = evFormatVal(k, v);
+        const scoreNum = isScore ? Math.round(v) : null;
+        const sc = isScore ? evScoreClass(scoreNum) : '';
+        const barColor = sc === 'high' ? '#34d399' : sc === 'low' ? '#fb7185' : '#60a5fa';
+
+        let valHtml;
+        if (isEnum) {
+          valHtml = `<span class="ev-enum-pill ${evEnumClass(v)}">${displayVal}</span>`;
+        } else if (isScore) {
+          valHtml = `<span class="ev-field-val score-${sc === 'high' ? 'high' : sc === 'low' ? 'low' : 'mid'}">${displayVal}</span>
+            <div class="ev-field-bar"><div class="ev-field-bar-fill" style="width:${Math.min(100,scoreNum)}%;background:${barColor}"></div></div>`;
+        } else {
+          valHtml = `<span class="ev-field-val">${displayVal}</span>`;
+        }
+
+        return `<div class="ev-field-item">
+          <div class="ev-field-key">${evFormatKey(k)}</div>
+          ${valHtml}
+        </div>`;
+      }).join('');
+
+      return `<div class="ev-detail" id="ev-detail-panel">
+        <div class="ev-detail-header">
+          <span class="ev-badge ${entity.isMeta ? 'meta' : 'agent'}">${entity.isMeta ? 'Factor' : 'Co.'}</span>
+          <div>
+            <div class="ev-detail-name">${escapeHtml(entity.name)}</div>
+            <div class="ev-detail-cat">${catLabel}</div>
+          </div>
+        </div>
+        <div class="ev-fields-grid">${fields || '<span style="color:var(--text-muted)">No state data</span>'}</div>
+      </div>`;
+    }
+
     function renderEvGrid() {
       const grid = document.getElementById('ev-grid');
       if (!grid || !sim.entityVitals) return;
@@ -989,15 +1107,12 @@
       const field = evSelectedField || '__agent_market_power';
       let entities = sim.entityVitals;
 
-      // Filter
       if (evFilter === 'agents') entities = entities.filter(e => !e.isMeta);
-      else if (evFilter === 'meta')   entities = entities.filter(e => e.isMeta);
+      else if (evFilter === 'meta') entities = entities.filter(e => e.isMeta);
 
-      // For __agent_* fields, skip meta entities (they have no value)
       if (field.startsWith('__agent_')) entities = entities.filter(e => !e.isMeta);
       if (field.startsWith('__meta_'))  entities = entities.filter(e => e.isMeta);
 
-      // Sort by current (last tick) value descending
       entities = entities.slice().sort((a, b) => {
         const av = evGetVital(a, field); const bv = evGetVital(b, field);
         const ac = av.filter(v => v !== null); const bc = bv.filter(v => v !== null);
@@ -1014,17 +1129,19 @@
         const nonNull = vals.filter(v => v !== null);
         const current = nonNull[nonNull.length - 1] ?? null;
         const prev    = nonNull[nonNull.length - 2] ?? null;
-        const delta   = (current !== null && prev !== null) ? current - prev : null;
+        const delta   = (current !== null && prev !== null) ? Math.round((current - prev) * 10) / 10 : null;
         const sc      = evScoreClass(current);
         const deltaStr = delta === null ? '' : (delta > 0 ? `+${delta}` : `${delta}`);
         const deltaClass = delta === null ? 'flat' : delta > 0 ? 'up' : delta < 0 ? 'down' : 'flat';
         const sparkHtml = evSparkline(vals, sc);
         const barPct = current !== null ? current : 0;
+        const isActive = evSelectedEntity && evSelectedEntity.agentId === entity.agentId;
+        const catLabel = entity.isMeta ? 'Factor' : (CATEGORY_LABELS[entity.category] || 'Co.');
 
-        return `<div class="ev-card">
+        return `<div class="ev-card${isActive ? ' active' : ''}" onclick="onEvCardClick(${JSON.stringify(entity.agentId)})">
           <div class="ev-card-top">
             <div class="ev-card-name">${escapeHtml(entity.name)}</div>
-            <span class="ev-badge ${entity.isMeta ? 'meta' : 'agent'}">${entity.isMeta ? 'Factor' : 'Co.'}</span>
+            <span class="ev-badge ${entity.isMeta ? 'meta' : 'agent'}">${catLabel}</span>
           </div>
           <div class="ev-score-row">
             <span class="ev-score ${sc}">${current !== null ? current : '—'}</span>
@@ -1034,6 +1151,27 @@
           <div class="ev-bar-bg"><div class="ev-bar-fill ${sc}" style="width:${barPct}%"></div></div>
         </div>`;
       }).join('');
+
+      // Render or clear detail panel
+      const section = document.getElementById('entity-vitals-section');
+      let detailEl = document.getElementById('ev-detail-panel');
+      if (detailEl) detailEl.remove();
+      if (evSelectedEntity) {
+        const fullEntity = sim.entityVitals.find(e => e.agentId === evSelectedEntity.agentId);
+        if (fullEntity && section) section.insertAdjacentHTML('beforeend', renderEvDetailPanel(fullEntity));
+      }
+    }
+
+    function onEvCardClick(agentId) {
+      const entity = sim.entityVitals.find(e => e.agentId === agentId);
+      if (!entity) return;
+      // Toggle off if same card clicked again
+      if (evSelectedEntity && evSelectedEntity.agentId === agentId) {
+        evSelectedEntity = null;
+      } else {
+        evSelectedEntity = entity;
+      }
+      renderEvGrid();
     }
 
     // ─────────────────────────────────────────────────────────────────────────
