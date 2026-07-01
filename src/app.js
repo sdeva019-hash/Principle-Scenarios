@@ -36,7 +36,7 @@ if (IS_PROD) app.set('trust proxy', 1);
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser(SESSION_SECRET));
-app.use(express.static(join(__dirname, '../public')));
+app.use(express.static(join(__dirname, '../public'), { etag: false, maxAge: 0, setHeaders: (res) => res.setHeader('Cache-Control', 'no-store') }));
 
 if (IS_PROD && SESSION_SECRET === 'dev-secret-change-me') {
   console.warn('WARNING: SESSION_SECRET is not set in production. Set it in Railway env vars.');

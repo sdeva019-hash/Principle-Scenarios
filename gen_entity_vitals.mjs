@@ -69,7 +69,7 @@ for (const dirName of agentDirs) {
   for (const tf of tickFiles) {
     const tickNum = parseInt(tf.match(/(\d+)/)[1]);
     let raw;
-    try { raw = JSON.parse(fs.readFileSync(path.join(agentPath, tf), 'utf8')); }
+    try { raw = JSON.parse(fs.readFileSync(path.join(agentPath, tf), 'utf8').replace(/^﻿/, '')); }
     catch { continue; }
 
     const state = {};

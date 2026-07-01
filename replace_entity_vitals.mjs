@@ -16,6 +16,7 @@ const SIM_MAP = {
   'bs-deepfake-crisis':           { folder: 'bs_deepfake_crisis',      anchor: "simulationId: 'bs-deepfake-crisis'" },
   'bs-opensource-surpasses':      { folder: 'bs_opensource_surpasses', anchor: "simulationId: 'bs-opensource-surpasses'" },
   'bs-quantum-rsa':               { folder: 'bs_quantum_rsa',          anchor: "simulationId: 'bs-quantum-rsa'" },
+  'bs-solar-storm':               { folder: 'bs_solar_storm',          anchor: "simulationId: 'bs-solar-storm'" },
 };
 
 if (!simId || !SIM_MAP[simId]) {

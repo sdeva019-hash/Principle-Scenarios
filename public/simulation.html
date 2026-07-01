@@ -19,6 +19,9 @@
       --green: #34d399;
       --red: #fb7185;
       --yellow: #fbbf24;
+      --indigo: #6366f1;
+      --indigo-dim: rgba(99,102,241,0.14);
+      --indigo-border: rgba(99,102,241,0.25);
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
@@ -278,6 +281,108 @@
     .ev-enum-pill.positive { background: rgba(52,211,153,0.12); color: var(--green); border-color: rgba(52,211,153,0.25); }
     .ev-enum-pill.negative { background: rgba(251,113,133,0.12); color: var(--red); border-color: rgba(251,113,133,0.25); }
     .ev-enum-pill.warning  { background: rgba(251,191,36,0.12); color: var(--yellow); border-color: rgba(251,191,36,0.25); }
+
+    /* Augur-style World Card */
+    .aug-world-card { background: rgba(10,10,18,0.9); border: 1px solid var(--indigo-border); border-radius: 16px; overflow: hidden; backdrop-filter: blur(10px); margin-bottom: 20px; }
+    .aug-wc-header { padding: 16px 22px 14px; border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(99,102,241,0.06); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    .aug-wc-title { font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 8px; }
+    .aug-chips-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .aug-chip-label { font-size: 11px; color: #6b7280; }
+    .aug-chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #6b7280; font-size: 11px; cursor: pointer; transition: all 0.15s; user-select: none; }
+    .aug-chip.active { background: var(--indigo-dim); border-color: rgba(99,102,241,0.4); color: #a5b4fc; }
+    .aug-chip-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .aug-panels { display: grid; grid-template-columns: 1fr 1fr; }
+    @media (max-width: 700px) { .aug-panels { grid-template-columns: 1fr; } }
+    .aug-panel { padding: 16px 20px; }
+    .aug-panel:first-child { border-right: 1px solid rgba(255,255,255,0.05); }
+    .aug-panel-head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+    .aug-metric-select { background: rgba(8,12,24,0.8); border: 1px solid rgba(99,102,241,0.2); color: #c4c4e0; font-size: 12px; padding: 5px 8px; border-radius: 6px; font-family: inherit; outline: none; cursor: pointer; flex: 1; min-width: 0; }
+    .aug-metric-select:focus { border-color: rgba(99,102,241,0.5); }
+    .aug-current { font-size: 20px; font-weight: 700; color: #f0f0ff; white-space: nowrap; }
+    .aug-delta { font-size: 11px; padding: 2px 6px; border-radius: 10px; font-weight: 500; white-space: nowrap; }
+    .aug-delta.neg { background: rgba(239,68,68,0.12); color: #f87171; }
+    .aug-delta.pos { background: rgba(52,211,153,0.12); color: #34d399; }
+    .aug-chart-wrap { position: relative; height: 190px; }
+    .aug-events { padding: 12px 22px 16px; border-top: 1px solid rgba(255,255,255,0.04); display: flex; flex-direction: column; gap: 6px; }
+    .aug-event-row { display: flex; gap: 10px; align-items: flex-start; }
+    .aug-event-tick { font-size: 10px; font-weight: 600; color: var(--indigo); background: var(--indigo-dim); padding: 2px 7px; border-radius: 4px; white-space: nowrap; flex-shrink: 0; margin-top: 2px; }
+    .aug-event-text { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+    .aug-hover-panel { display: none; padding: 14px 20px; border-top: 1px solid rgba(99,102,241,0.15); background: rgba(99,102,241,0.05); }
+    .aug-hover-tick-date { font-size: 11px; font-weight: 600; color: #a5b4fc; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+    .aug-hover-events { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+    .aug-hover-event { display: flex; gap: 10px; align-items: flex-start; }
+    .aug-hover-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+    .aug-hover-event-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+    .aug-hover-event-desc { font-size: 12px; color: var(--text-muted); line-height: 1.55; }
+    .aug-hover-summary { font-size: 12px; color: var(--text-muted); line-height: 1.65; padding: 10px 12px; background: rgba(255,255,255,0.03); border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); }
+    .aug-hover-nodata { font-size: 12px; color: #4b5563; font-style: italic; }
+
+    /* ── Solar Storm enhanced UX ── */
+    .hero-block { border: 1px solid var(--indigo-border); border-radius: 16px; padding: 26px 28px; margin-bottom: 20px; background: rgba(8,10,20,0.7); backdrop-filter: blur(10px); }
+    .hero-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--indigo); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .hero-eyebrow::after { content: ''; flex: 1; height: 1px; background: var(--indigo-border); }
+    .hero-summary-text { font-size: 15px; color: var(--text); line-height: 1.8; margin-bottom: 20px; }
+    .hero-kpis { display: flex; gap: 28px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,0.06); flex-wrap: wrap; }
+    .hero-kpi { display: flex; flex-direction: column; gap: 3px; }
+    .hero-kpi-val { font-size: 26px; font-weight: 700; line-height: 1; }
+    .hero-kpi-val.neg { color: var(--red); }
+    .hero-kpi-val.pos { color: var(--green); }
+    .hero-kpi-val.neutral { color: var(--accent-bright); }
+    .hero-kpi-lbl { font-size: 11px; color: var(--text-muted); }
+
+    .ev-timeline-outer { margin-bottom: 20px; }
+    .ev-timeline-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+    .ev-timeline-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .ev-tl-scroll { display: flex; gap: 0; overflow-x: auto; padding-bottom: 10px; scrollbar-width: thin; cursor: grab; }
+    .ev-tl-scroll::-webkit-scrollbar { height: 3px; }
+    .ev-tl-scroll::-webkit-scrollbar-thumb { background: var(--indigo-border); border-radius: 2px; }
+    .ev-tl-item { display: flex; flex-direction: column; min-width: 210px; max-width: 230px; flex-shrink: 0; }
+    .ev-tl-connector { display: flex; align-items: center; height: 20px; margin-bottom: 10px; }
+    .ev-tl-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; border: 2px solid rgba(10,22,40,1); z-index: 1; }
+    .ev-tl-line { flex: 1; height: 2px; background: rgba(99,102,241,0.18); }
+    .ev-tl-item:last-child .ev-tl-line { opacity: 0; }
+    .ev-tl-card { background: rgba(15,23,42,0.7); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-right: 12px; flex: 1; transition: border-color 0.2s, background 0.2s; }
+    .ev-tl-card:hover { border-color: var(--indigo-border); background: rgba(20,30,55,0.8); }
+    .ev-tl-meta { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+    .ev-tl-tick { font-size: 9px; font-weight: 700; letter-spacing: 0.06em; color: var(--indigo); background: var(--indigo-dim); padding: 1px 6px; border-radius: 4px; }
+    .ev-tl-date { font-size: 10px; color: var(--text-muted); }
+    .ev-tl-title { font-size: 12px; font-weight: 600; color: var(--text); line-height: 1.4; margin-bottom: 4px; }
+    .ev-tl-desc { font-size: 11px; color: var(--text-muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+    .hm-section { display: grid; grid-template-columns: repeat(3, minmax(220px, 1fr)); gap: 14px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: thin; }
+    .hm-section::-webkit-scrollbar { height: 3px; }
+    .hm-section::-webkit-scrollbar-thumb { background: var(--indigo-border); border-radius: 2px; }
+    .hm-card { background: rgba(10,12,22,0.85); border: 1px solid var(--indigo-border); border-radius: 14px; padding: 18px 20px; backdrop-filter: blur(8px); }
+    .hm-eyebrow { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 8px; }
+    .hm-value-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+    .hm-value { font-size: 30px; font-weight: 700; line-height: 1; color: var(--text); }
+    .hm-delta-pill { font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 10px; }
+    .hm-delta-pill.neg { background: rgba(251,113,133,0.12); color: var(--red); }
+    .hm-delta-pill.pos { background: rgba(52,211,153,0.12); color: var(--green); }
+    .hm-context { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 12px; }
+    .hm-chart-wrap { position: relative; height: 72px; }
+
+    .wl-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-bottom: 20px; backdrop-filter: blur(10px); }
+    .wl-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; gap: 12px; flex-wrap: wrap; }
+    .wl-head h2 { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .wl-show-all { font-size: 12px; color: var(--accent-bright); background: none; border: 1px solid var(--border-strong); border-radius: 8px; padding: 5px 12px; cursor: pointer; transition: all 0.15s; }
+    .wl-show-all:hover { background: rgba(59,130,246,0.1); }
+    .wl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 640px) { .wl-grid { grid-template-columns: 1fr; } }
+    .wl-col-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+    .wl-col-title.win { color: var(--green); }
+    .wl-col-title.lose { color: var(--red); }
+    .wl-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid rgba(96,165,250,0.05); }
+    .wl-row:last-child { border-bottom: none; }
+    .wl-rank { font-size: 11px; color: var(--text-muted); width: 16px; text-align: center; flex-shrink: 0; }
+    .wl-info { flex: 1; min-width: 0; }
+    .wl-name { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .wl-cat { font-size: 10px; color: var(--text-muted); }
+    .wl-delta { font-size: 13px; font-weight: 700; flex-shrink: 0; min-width: 44px; text-align: right; }
+    .wl-delta.pos { color: var(--green); }
+    .wl-delta.neg { color: var(--red); }
+    .wl-bar { width: 52px; height: 4px; border-radius: 2px; background: rgba(96,165,250,0.08); overflow: hidden; flex-shrink: 0; }
+    .wl-bar-fill { height: 4px; border-radius: 2px; }
   </style>
 </head>
 <body>
@@ -397,7 +502,6 @@
               <span class="stat-pill"><strong id="cc">${sim.confidenceCount}</strong> confidence ${sim.followerCount > 0 ? `(<strong id="cp">${sim.confidencePct}</strong>%)` : ''}</span>
             </div>
             <h1 class="sim-title">${escapeHtml(sim.title)}</h1>
-            <p class="sim-desc">${escapeHtml(sim.description)}</p>
             <div class="actions">
               <button class="btn ${sim.isFollowing ? 'primary' : ''}" id="follow-btn">
                 ${sim.isFollowing ? '✓ Following' : 'Follow'}
@@ -412,7 +516,15 @@
             </div>
           </div>
 
-          ${sim.worldCard && sim.worldCard.fields && sim.worldCard.fields.length ? renderWorldCardSection(sim.worldCard) : ''}
+          ${renderSimHeroBlock()}
+
+          ${renderEventTimeline()}
+
+          ${renderHeadlineMetrics()}
+
+          ${renderWinnersLosers()}
+
+          ${sim.worldCard && sim.worldCard.fields && sim.worldCard.fields.length ? renderAugurWorldCard(sim.worldCard) : ''}
 
           ${sim.entityVitals && sim.entityVitals.length ? renderEntityVitalsSection(sim.entityVitals) : ''}
 
@@ -452,8 +564,9 @@
       `;
 
       if (sim.worldCard && sim.worldCard.fields.length) {
-        onWcFieldChange(sim.worldCard.fields[0]);
+        buildAugurCharts();
       }
+      initEnhancements();
 
       if (sim.entityVitals && sim.entityVitals.length) {
         evSelectedField = '__agent_market_power';
@@ -748,6 +861,440 @@
         .replace(/\bGpu\b/g, 'GPU').replace(/\bGw\b/g, 'GW').replace(/\bPct\b/g, '%')
         .replace(/\bYoy\b/g, 'YoY');
     }
+
+    // ─── Solar Storm enhanced UX ─────────────────────────────────────────────
+
+    function buildSimMeta() {
+      const wc = sim.worldCard;
+      const ticks = wc?.ticks || [];
+      const fields = wc?.fields || [];
+      const entities = (sim.entityVitals || []).filter(e => !e.isMeta);
+      const events = sim.events || [];
+
+      // KPIs: entity count, tick count, event count, trajectory swing
+      const traj = sim.trajectory || [];
+      const trajVals = traj.map(p => p.value);
+      const swing = trajVals.length > 1
+        ? Math.round(Math.abs(trajVals[trajVals.length - 1] - trajVals[0]) * 100)
+        : null;
+
+      const kpis = [
+        ticks.length ? { val: ticks.length, label: 'Simulation ticks', cls: 'neutral' } : null,
+        entities.length ? { val: entities.length, label: 'Companies tracked', cls: 'neutral' } : null,
+        events.length ? { val: events.length, label: 'Key events', cls: 'neutral' } : null,
+        swing !== null ? { val: (swing > 0 ? '' : '') + swing + 'pp', label: 'Sentiment swing (T0→end)', cls: swing > 20 ? 'neg' : 'pos' } : null,
+      ].filter(Boolean);
+
+      // Headline fields: first 3 from world card
+      const headlineFields = fields.slice(0, 3).map(f => {
+        const vals = ticks.map(t => t.values[f]).filter(v => v != null);
+        const first = vals[0], last = vals[vals.length - 1];
+        const pct = first !== 0 ? Math.round(((last - first) / Math.abs(first)) * 100) : 0;
+        const dir = pct > 0 ? 'Rose' : pct < 0 ? 'Fell' : 'Held steady';
+        return {
+          field: f,
+          label: fieldLabel(f),
+          context: `${dir} ${Math.abs(pct)}% over the simulation horizon across ${ticks.length} tracked periods.`
+        };
+      });
+
+      return { kpis, headlineFields };
+    }
+
+    function nearestTickIdx(timestamp, ticks) {
+      const t = new Date(timestamp).getTime();
+      let best = 0, bestDist = Infinity;
+      ticks.forEach((tk, i) => {
+        const d = Math.abs(new Date(tk.t).getTime() - t);
+        if (d < bestDist) { bestDist = d; best = i; }
+      });
+      return best;
+    }
+
+    function renderSimHeroBlock() {
+      const meta = buildSimMeta();
+      const kpisHtml = meta.kpis.map(k => `
+        <div class="hero-kpi">
+          <div class="hero-kpi-val ${k.cls}">${k.val}</div>
+          <div class="hero-kpi-lbl">${k.label}</div>
+        </div>`).join('');
+      return `
+        <div class="hero-block">
+          <div class="hero-eyebrow">What happened</div>
+          <p class="hero-summary-text">${escapeHtml(sim.description || '')}</p>
+          <div class="hero-kpis">${kpisHtml}</div>
+        </div>`;
+    }
+
+    function renderEventTimeline() {
+      const ticks = sim.worldCard?.ticks || [];
+      const events = [...(sim.events || [])].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+      if (!events.length) return '';
+      const items = events.map(ev => {
+        const ti = ticks.length ? nearestTickIdx(ev.timestamp, ticks) : '?';
+        const dotColor = ev.impact === 'up' ? '#34d399' : ev.impact === 'down' ? '#f87171' : '#94a3b8';
+        const dateStr = new Date(ev.timestamp).toLocaleDateString(undefined, { month: 'short', year: 'numeric' });
+        return `
+          <div class="ev-tl-item">
+            <div class="ev-tl-connector">
+              <div class="ev-tl-dot" style="background:${dotColor}"></div>
+              <div class="ev-tl-line"></div>
+            </div>
+            <div class="ev-tl-card">
+              <div class="ev-tl-meta">
+                <span class="ev-tl-tick">T${ti}</span>
+                <span class="ev-tl-date">${dateStr}</span>
+              </div>
+              <div class="ev-tl-title">${escapeHtml(ev.title)}</div>
+              <div class="ev-tl-desc">${escapeHtml(ev.description || '')}</div>
+            </div>
+          </div>`;
+      }).join('');
+      return `
+        <div class="ev-timeline-outer">
+          <div class="ev-timeline-label">How it unfolded</div>
+          <div class="ev-tl-scroll" id="ev-tl-scroll">${items}</div>
+        </div>`;
+    }
+
+    function renderHeadlineMetrics() {
+      const wc = sim.worldCard;
+      if (!wc || !wc.fields.length) return '';
+      const meta = buildSimMeta();
+      const cards = meta.headlineFields.map((hf, idx) => {
+        const vals = wc.ticks.map(t => t.values[hf.field]).filter(v => v != null);
+        if (!vals.length) return '';
+        const last = vals[vals.length - 1], first = vals[0];
+        const pct = first !== 0 ? Math.round(((last - first) / Math.abs(first)) * 100) : 0;
+        return `
+          <div class="hm-card">
+            <div class="hm-eyebrow">${escapeHtml(hf.label)}</div>
+            <div class="hm-value-row">
+              <span class="hm-value">${fmt(last, hf.field)}</span>
+              <span class="hm-delta-pill ${pct >= 0 ? 'pos' : 'neg'}">${pct >= 0 ? '+' : ''}${pct}%</span>
+            </div>
+            <p class="hm-context">${escapeHtml(hf.context)}</p>
+            <div class="hm-chart-wrap"><canvas id="hm-chart-${idx}" role="img" aria-label="${escapeHtml(hf.label)} trend">${escapeHtml(hf.label)} trajectory.</canvas></div>
+          </div>`;
+      }).join('');
+      return cards ? `<div class="hm-section">${cards}</div>` : '';
+    }
+
+    function renderWinnersLosers() {
+      if (!sim.entityVitals || !sim.entityVitals.length) return '';
+      const total = sim.entityVitals.filter(e => !e.isMeta).length;
+      return `<div class="wl-section" id="wl-section">
+        <div class="wl-head">
+          <h2>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+            Company impact — who gained, who lost
+          </h2>
+          <button class="wl-show-all" onclick="document.getElementById('entity-vitals-section').scrollIntoView({behavior:'smooth'})">See all ${total} companies ↓</button>
+        </div>
+        <div class="wl-grid" id="wl-grid"><div style="color:var(--text-muted);font-size:13px;">Loading…</div></div>
+      </div>`;
+    }
+
+    function initEnhancements() {
+      if (typeof Chart === 'undefined') return;
+
+      // Headline mini charts
+      const wc = sim.worldCard;
+      if (wc) {
+        const labels = wc.ticks.map((t, i) => `T${i}`);
+        const meta = buildSimMeta();
+        meta.headlineFields.forEach((hf, idx) => {
+          const canvas = document.getElementById(`hm-chart-${idx}`);
+          if (!canvas) return;
+          const vals = wc.ticks.map(t => t.values[hf.field]).filter(v => v != null);
+          const color = vals[vals.length - 1] < vals[0] ? '#fb7185' : '#34d399';
+          new Chart(canvas, {
+            type: 'line',
+            data: { labels: labels.slice(0, vals.length), datasets: [{ data: vals, borderColor: color, backgroundColor: color + '18', borderWidth: 2, tension: 0.35, pointRadius: 2, fill: true }] },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: { legend: { display: false }, tooltip: { enabled: false } },
+              scales: { x: { display: false }, y: { display: false } }
+            }
+          });
+        });
+      }
+
+      // Winners & Losers
+      if (sim.entityVitals && sim.entityVitals.length) {
+        const real = sim.entityVitals.filter(e => !e.isMeta);
+        const withDelta = real.map(e => {
+          const vals = e.ticks.map(t => t.state?.market_power ?? null).filter(v => v !== null);
+          const first = vals[0] ?? 0, last = vals[vals.length - 1] ?? 0;
+          return { ...e, delta: Math.round(last - first), current: Math.round(last) };
+        }).filter(e => e.delta !== 0);
+        withDelta.sort((a, b) => b.delta - a.delta);
+        const winners = withDelta.slice(0, 5);
+        const losers = withDelta.slice(-5).reverse();
+        const maxAbs = Math.max(...withDelta.map(e => Math.abs(e.delta)), 1);
+
+        function rowHtml(e, i, isWin) {
+          const barW = Math.round((Math.abs(e.delta) / maxAbs) * 100);
+          const barColor = isWin ? '#34d399' : '#fb7185';
+          const catLabel = CATEGORY_LABELS[e.category] || e.category || '';
+          return `<div class="wl-row">
+            <span class="wl-rank">${i + 1}</span>
+            <div class="wl-info">
+              <div class="wl-name">${escapeHtml(e.name)}</div>
+              <div class="wl-cat">${catLabel}</div>
+            </div>
+            <span class="wl-delta ${isWin ? 'pos' : 'neg'}">${isWin ? '+' : ''}${e.delta}</span>
+            <div class="wl-bar"><div class="wl-bar-fill" style="width:${barW}%;background:${barColor}"></div></div>
+          </div>`;
+        }
+
+        const grid = document.getElementById('wl-grid');
+        if (grid) {
+          grid.innerHTML = `
+            <div>
+              <div class="wl-col-title win">▲ Gained market power</div>
+              ${winners.map((e, i) => rowHtml(e, i, true)).join('')}
+            </div>
+            <div>
+              <div class="wl-col-title lose">▼ Lost market power</div>
+              ${losers.map((e, i) => rowHtml(e, i, false)).join('')}
+            </div>`;
+        }
+      }
+
+      // Drag-scroll on timeline
+      const tl = document.getElementById('ev-tl-scroll');
+      if (tl) {
+        let isDown = false, startX, scrollLeft;
+        tl.addEventListener('mousedown', e => { isDown = true; startX = e.pageX - tl.offsetLeft; scrollLeft = tl.scrollLeft; tl.style.cursor = 'grabbing'; });
+        tl.addEventListener('mouseleave', () => { isDown = false; tl.style.cursor = 'grab'; });
+        tl.addEventListener('mouseup', () => { isDown = false; tl.style.cursor = 'grab'; });
+        tl.addEventListener('mousemove', e => { if (!isDown) return; e.preventDefault(); tl.scrollLeft = scrollLeft - (e.pageX - tl.offsetLeft - startX); });
+      }
+    }
+
+    // ─── Augur-style World Card ──────────────────────────────────────────────
+
+    let augChartA = null, augChartB = null;
+
+    function renderAugurWorldCard(wc) {
+      const fields = wc.fields;
+      const opts = (selectedIdx) => fields.map((f, i) =>
+        `<option value="${i}"${i === selectedIdx ? ' selected' : ''}>${escapeHtml(fieldLabel(f))}</option>`
+      ).join('');
+
+      const eventsHtml = (sim.events || []).slice(0, 4).map((ev, idx) => {
+        const tickLabel = `T${idx + 1}`;
+        return `<div class="aug-event-row">
+          <span class="aug-event-tick">${tickLabel}</span>
+          <span class="aug-event-text">${escapeHtml(ev.title)}${ev.description ? ' — ' + escapeHtml(ev.description.slice(0, 100)) : ''}</span>
+        </div>`;
+      }).join('');
+
+      return `
+        <div class="aug-world-card" id="world-card-section">
+          <div class="aug-wc-header">
+            <div class="aug-wc-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              World Card
+            </div>
+            <div class="aug-chips-row">
+              <span class="aug-chip-label">View:</span>
+              <span class="aug-chip active" data-aug-view="dual" onclick="onAugViewToggle(this)">
+                <span class="aug-chip-dot" style="background:#6366f1"></span>Dual metric
+              </span>
+              <span class="aug-chip" data-aug-view="table" onclick="onAugViewToggle(this)">
+                <span class="aug-chip-dot" style="background:#94a3b8"></span>Tick table
+              </span>
+            </div>
+          </div>
+          <div id="aug-dual-view">
+            <div class="aug-panels">
+              <div class="aug-panel">
+                <div class="aug-panel-head">
+                  <select class="aug-metric-select" id="aug-sel-a" onchange="onAugMetricChange('a')">
+                    ${opts(0)}
+                  </select>
+                  <span class="aug-current" id="aug-val-a">—</span>
+                  <span class="aug-delta" id="aug-delta-a"></span>
+                </div>
+                <div class="aug-chart-wrap"><canvas id="aug-chart-a" role="img" aria-label="Metric A trajectory over simulation ticks">World card metric A over time.</canvas></div>
+              </div>
+              <div class="aug-panel">
+                <div class="aug-panel-head">
+                  <select class="aug-metric-select" id="aug-sel-b" onchange="onAugMetricChange('b')">
+                    ${opts(Math.min(1, fields.length - 1))}
+                  </select>
+                  <span class="aug-current" id="aug-val-b">—</span>
+                  <span class="aug-delta" id="aug-delta-b"></span>
+                </div>
+                <div class="aug-chart-wrap"><canvas id="aug-chart-b" role="img" aria-label="Metric B trajectory over simulation ticks">World card metric B over time.</canvas></div>
+              </div>
+            </div>
+            <div id="aug-hover-panel" class="aug-hover-panel"></div>
+            ${eventsHtml ? `<div class="aug-events">${eventsHtml}</div>` : ''}
+          </div>
+          <div id="aug-table-view" style="display:none;padding:16px 20px;">
+            <select class="wc-field-select" id="wc-field-select" onchange="onWcFieldChange(this.value)" style="margin-bottom:16px;">
+              ${fields.map(f => `<option value="${escapeHtml(f)}">${escapeHtml(fieldLabel(f))}</option>`).join('')}
+            </select>
+            <div class="wc-stat-row" id="wc-stats"></div>
+            <table class="wc-tick-table" id="wc-table" style="margin-top:8px;">
+              <thead><tr><th>Date</th><th id="wc-th-val">Value</th><th>Δ vs prev</th></tr></thead>
+              <tbody id="wc-tbody"></tbody>
+            </table>
+          </div>
+        </div>`;
+    }
+
+    window.onAugViewToggle = function(chip) {
+      document.querySelectorAll('[data-aug-view]').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      const view = chip.dataset.augView;
+      document.getElementById('aug-dual-view').style.display = view === 'dual' ? '' : 'none';
+      document.getElementById('aug-table-view').style.display = view === 'table' ? '' : 'none';
+      if (view === 'table' && sim.worldCard) onWcFieldChange(sim.worldCard.fields[0]);
+    };
+
+    function buildAugurCharts() {
+      if (!sim.worldCard || typeof Chart === 'undefined') return;
+      const wc = sim.worldCard;
+      const labels = wc.ticks.map(t =>
+        new Date(t.t).toLocaleDateString(undefined, { month: 'short', year: '2-digit' })
+      );
+
+      function makeDataset(fieldIdx) {
+        const field = wc.fields[fieldIdx];
+        return {
+          label: fieldLabel(field),
+          data: wc.ticks.map(t => t.values[field]),
+          borderColor: '#6366f1',
+          backgroundColor: 'rgba(99,102,241,0.1)',
+          borderWidth: 2,
+          tension: 0.35,
+          pointRadius: 3,
+          pointBackgroundColor: '#6366f1',
+          fill: true
+        };
+      }
+
+      const sharedOpts = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: false }
+        },
+        onHover: (event, activeElements) => {
+          augHandleHover(activeElements.length ? activeElements[0].index : null);
+        },
+        scales: {
+          x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#64748b', font: { size: 10 } } },
+          y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#64748b', font: { size: 10 } } }
+        }
+      };
+
+      if (augChartA) { augChartA.destroy(); augChartA = null; }
+      if (augChartB) { augChartB.destroy(); augChartB = null; }
+
+      const canvasA = document.getElementById('aug-chart-a');
+      const canvasB = document.getElementById('aug-chart-b');
+      if (!canvasA || !canvasB) return;
+
+      augChartA = new Chart(canvasA, { type: 'line', data: { labels, datasets: [makeDataset(0)] }, options: sharedOpts });
+      augChartB = new Chart(canvasB, { type: 'line', data: { labels, datasets: [makeDataset(Math.min(1, wc.fields.length - 1))] }, options: sharedOpts });
+
+      augUpdateStats('a', 0);
+      augUpdateStats('b', Math.min(1, wc.fields.length - 1));
+
+      [canvasA, canvasB].forEach(c => {
+        c.addEventListener('mouseleave', () => augHandleHover(null));
+      });
+    }
+
+    function augHandleHover(tickIdx) {
+      const panel = document.getElementById('aug-hover-panel');
+      if (!panel || !sim.worldCard) return;
+
+      if (tickIdx === null) {
+        panel.style.display = 'none';
+        return;
+      }
+
+      const tick = sim.worldCard.ticks[tickIdx];
+      if (!tick) { panel.style.display = 'none'; return; }
+
+      const tickTime = new Date(tick.t).getTime();
+      const WINDOW_MS = 1000 * 60 * 60 * 24 * 60;
+      const nearEvents = (sim.events || []).filter(ev =>
+        Math.abs(new Date(ev.timestamp).getTime() - tickTime) < WINDOW_MS
+      );
+      const summary = tick.landscapeSummary || '';
+      const dateStr = new Date(tick.t).toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+
+      let html = `<div class="aug-hover-tick-date">T${tickIdx} &mdash; ${dateStr}</div>`;
+
+      if (nearEvents.length) {
+        html += `<div class="aug-hover-events">`;
+        nearEvents.forEach(ev => {
+          const dotColor = ev.impact === 'up' ? '#34d399' : ev.impact === 'down' ? '#f87171' : '#94a3b8';
+          html += `<div class="aug-hover-event">
+            <div class="aug-hover-dot" style="background:${dotColor}"></div>
+            <div>
+              <div class="aug-hover-event-title">${escapeHtml(ev.title)}</div>
+              ${ev.description ? `<div class="aug-hover-event-desc">${escapeHtml(ev.description)}</div>` : ''}
+            </div>
+          </div>`;
+        });
+        html += `</div>`;
+      }
+
+      if (summary) {
+        html += `<div class="aug-hover-summary">${escapeHtml(summary)}</div>`;
+      }
+
+      if (!nearEvents.length && !summary) {
+        html += `<div class="aug-hover-nodata">No events recorded at this tick.</div>`;
+      }
+
+      panel.innerHTML = html;
+      panel.style.display = 'block';
+    }
+
+    window.onAugMetricChange = function(panel) {
+      if (!sim.worldCard) return;
+      const wc = sim.worldCard;
+      const idx = parseInt(document.getElementById(`aug-sel-${panel}`).value);
+      const chart = panel === 'a' ? augChartA : augChartB;
+      if (chart) {
+        const field = wc.fields[idx];
+        chart.data.datasets[0].data = wc.ticks.map(t => t.values[field]);
+        chart.data.datasets[0].label = fieldLabel(field);
+        chart.update();
+      }
+      augUpdateStats(panel, idx);
+    };
+
+    function augUpdateStats(panel, fieldIdx) {
+      if (!sim.worldCard) return;
+      const wc = sim.worldCard;
+      const field = wc.fields[fieldIdx];
+      const vals = wc.ticks.map(t => t.values[field]).filter(v => v != null);
+      if (!vals.length) return;
+      const last = vals[vals.length - 1];
+      const first = vals[0];
+      const pct = first !== 0 ? Math.round(((last - first) / Math.abs(first)) * 100) : 0;
+
+      const valEl = document.getElementById(`aug-val-${panel}`);
+      const deltaEl = document.getElementById(`aug-delta-${panel}`);
+      if (valEl) valEl.textContent = fmt(last, field);
+      if (deltaEl) {
+        deltaEl.textContent = (pct >= 0 ? '+' : '') + pct + '%';
+        deltaEl.className = 'aug-delta ' + (pct >= 0 ? 'pos' : 'neg');
+      }
+    }
+
+    // ─── Legacy World Card (tick table view) ─────────────────────────────────
 
     function renderWorldCardSection(wc) {
       const options = wc.fields.map(f =>
@@ -1138,7 +1685,7 @@
         const isActive = evSelectedEntity && evSelectedEntity.agentId === entity.agentId;
         const catLabel = entity.isMeta ? 'Factor' : (CATEGORY_LABELS[entity.category] || 'Co.');
 
-        return `<div class="ev-card${isActive ? ' active' : ''}" onclick="onEvCardClick(${JSON.stringify(entity.agentId)})">
+        return `<div class="ev-card${isActive ? ' active' : ''}" data-agent-id="${escapeHtml(entity.agentId)}">
           <div class="ev-card-top">
             <div class="ev-card-name">${escapeHtml(entity.name)}</div>
             <span class="ev-badge ${entity.isMeta ? 'meta' : 'agent'}">${catLabel}</span>
@@ -1152,13 +1699,25 @@
         </div>`;
       }).join('');
 
+      // Event delegation — one listener handles all card clicks
+      grid._evHandler && grid.removeEventListener('click', grid._evHandler);
+      grid._evHandler = function(e) {
+        const card = e.target.closest('.ev-card');
+        if (!card) return;
+        onEvCardClick(card.dataset.agentId);
+      };
+      grid.addEventListener('click', grid._evHandler);
+
       // Render or clear detail panel
       const section = document.getElementById('entity-vitals-section');
       let detailEl = document.getElementById('ev-detail-panel');
       if (detailEl) detailEl.remove();
       if (evSelectedEntity) {
         const fullEntity = sim.entityVitals.find(e => e.agentId === evSelectedEntity.agentId);
-        if (fullEntity && section) section.insertAdjacentHTML('beforeend', renderEvDetailPanel(fullEntity));
+        if (fullEntity && grid) {
+          grid.insertAdjacentHTML('beforebegin', renderEvDetailPanel(fullEntity));
+          document.getElementById('ev-detail-panel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
       }
     }
 
@@ -1466,5 +2025,6 @@
     }
     function escapeAttr(s) { return escapeHtml(s); }
   </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" onload="if(typeof buildAugurCharts==='function' && sim && sim.worldCard) { buildAugurCharts(); initEnhancements(); }"></script>
 </body>
 </html>
